@@ -125,7 +125,7 @@ def test_logo_upload():
         logo_path = os.path.join(LOGOS_DIR, logo_filename)
         
         logo_file.save(logo_path)
-        logo_url = f"/static/logos/{logo_filename}"
+        logo_url = f"/daily/static/logos/{logo_filename}"
         
         return jsonify({
             'success': True,
@@ -138,7 +138,7 @@ def test_logo_upload():
         print(f"Error in test logo upload: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/static/logos/<filename>')
+@app.route('/daily/static/logos/<filename>')
 def serve_logo(filename):
     """Serve logo files"""
     try:
@@ -151,6 +151,20 @@ def serve_logo(filename):
     except Exception as e:
         print(f"Error serving logo {filename}: {str(e)}")
         return "Error serving logo", 500
+
+@app.route('/daily/static/<filename>')
+def serve_static(filename):
+    """Serve static files"""
+    try:
+        static_path = os.path.join('static', filename)
+        if os.path.exists(static_path):
+            from flask import send_file
+            return send_file(static_path)
+        else:
+            return "File not found", 404
+    except Exception as e:
+        print(f"Error serving static file {filename}: {str(e)}")
+        return "Error serving static file", 500
 
 @app.route('/api/extract-topics', methods=['POST'])
 def extract_topics():
@@ -234,7 +248,7 @@ def generate_from_upload():
                     
                     try:
                         logo_file.save(logo_path)
-                        logo_url = f"/static/logos/{logo_filename}"
+                        logo_url = f"/daily/static/logos/{logo_filename}"
                         print(f"Logo saved successfully: {logo_path}")
                         print(f"Logo URL: {logo_url}")
                     except Exception as e:
