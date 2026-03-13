@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -687,37 +687,42 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://kompa.ai/assets/images/logo.svg" alt="Kompa.ai" style="height: 3rem; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <img src="https://kompa.ai/assets/images/logo.svg" alt="Kompa.ai" style="height: 3rem; filter: brightness(0) invert(1);">
+                <a href="/logout" style="color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 600; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                    🚪 Logout
+                </a>
+            </div>
             <h1>Report Generator</h1>
-            <p>Tạo báo cáo từ file Excel với 3 bước đơn giản</p>
+            <p>Generate reports from Excel files in 3 simple steps</p>
         </div>
         
         <div class="main-card">
             <h2>Generate Report from Excel File</h2>
-            <p style="margin-bottom: 30px; color: #666;">Upload file Excel và điền thông tin để tạo báo cáo từ API</p>
+            <p style="margin-bottom: 30px; color: #666;">Upload Excel file and fill in information to generate report from API</p>
             
             <!-- Road Map -->
             <div class="roadmap">
                 <div class="step active" id="roadmap-step1">
                     <div class="step-circle">1</div>
                     <div class="step-title">Upload File</div>
-                    <div class="step-description">Chọn file Excel</div>
+                    <div class="step-description">Select Excel file</div>
                 </div>
                 <div class="step" id="roadmap-step2">
                     <div class="step-circle">2</div>
-                    <div class="step-title">Cấu hình</div>
-                    <div class="step-description">Thiết lập thông tin</div>
+                    <div class="step-title">Configuration</div>
+                    <div class="step-description">Setup information</div>
                 </div>
                 <div class="step" id="roadmap-step3">
                     <div class="step-circle">3</div>
-                    <div class="step-title">Tạo Report</div>
-                    <div class="step-description">Hoàn thành báo cáo</div>
+                    <div class="step-title">Generate Report</div>
+                    <div class="step-description">Complete report</div>
                 </div>
             </div>
             
             <!-- Step 1: File Upload and Topic Extraction -->
             <div id="step1" class="form-step active">
-                <h3>Bước 1: Upload file và chọn Topic</h3>
+                <h3>Step 1: Upload file and select Topic</h3>
                 <div class="form-group">
                     <label for="excelFile">Excel File:</label>
                     <input type="file" id="excelFile" name="file" accept=".xlsx,.xls" required style="padding: 8px;">
@@ -726,35 +731,35 @@
                 
                 <div id="topicSelection" style="display: none;">
                     <div class="form-group">
-                        <label for="topicDropdown">Chọn Brand Name từ Topics:</label>
+                        <label for="topicDropdown">Select Brand Name from Topics:</label>
                         <select id="topicDropdown" style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; width: 100%;">
-                            <option value="">-- Chọn topic --</option>
+                            <option value="">-- Select topic --</option>
                         </select>
                     </div>
-                    <button type="button" class="btn" onclick="showStep2()">Tiếp tục bước 2</button>
+                    <button type="button" class="btn" onclick="showStep2()">Continue to step 2</button>
                 </div>
             </div>
             
             <!-- Step 2: Report Configuration -->
             <div id="step2" class="form-step">
-                <h3>Bước 2: Cấu hình báo cáo</h3>
+                <h3>Step 2: Report configuration</h3>
                 <form id="uploadForm" enctype="multipart/form-data">
                     <input type="hidden" id="selectedTopic" name="brand_name">
                     
                     <div class="form-group">
-                        <label for="reportName">Tên Report:</label>
-                        <input type="text" id="reportName" name="report_name" placeholder="vd: Báo cáo ngành xăng dầu" required>
+                        <label for="reportName">Report Name:</label>
+                        <input type="text" id="reportName" name="report_name" placeholder="e.g: Oil & Gas Industry Report" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="brandLogo">Logo Thương hiệu (không bắt buộc):</label>
+                        <label for="brandLogo">Brand Logo (optional):</label>
                         <input type="file" id="brandLogo" name="brand_logo" accept=".png,.jpg,.jpeg,.svg" style="padding: 8px;" onchange="previewLogo(this)">
                         <small style="color: var(--gray-500); font-size: 0.75rem; margin-top: 0.5rem; display: block;">
-                            Chấp nhận file PNG, JPG, JPEG, SVG. Kích thước tối ưu: 200x60px
+                            Accepts PNG, JPG, JPEG, SVG files. Optimal size: 200x60px
                         </small>
                         <div id="logoPreview" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius); border: 1px solid var(--gray-200);">
                             <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-height: 60px; max-width: 200px; object-fit: contain;">
-                            <button type="button" onclick="removeLogo()" style="margin-left: 1rem; padding: 0.25rem 0.5rem; background: var(--error); color: white; border: none; border-radius: var(--radius-sm); font-size: 0.75rem; cursor: pointer;">✕ Xóa</button>
+                            <button type="button" onclick="removeLogo()" style="margin-left: 1rem; padding: 0.25rem 0.5rem; background: var(--error); color: white; border: none; border-radius: var(--radius-sm); font-size: 0.75rem; cursor: pointer;">✕ Remove</button>
                         </div>
                     </div>
                     
@@ -771,27 +776,27 @@
                     </div>
                     
                     <div class="flex-gap">
-                        <button type="button" class="btn secondary" onclick="showStep1()">Quay lại</button>
-                        <button type="submit" class="btn">Tạo Report</button>
+                        <button type="button" class="btn secondary" onclick="showStep1()">Go back</button>
+                        <button type="submit" class="btn">Generate Report</button>
                     </div>
                 </form>
             </div>
             
             <div id="uploadMessage" class="success-message">
-                <h3>Tạo báo cáo từ API thành công!</h3>
+                <h3>Report generated from API successfully!</h3>
                 <div class="link-box">
-                    <strong>Link truy cập:</strong><br>
+                    <strong>Access link:</strong><br>
                     <a id="uploadReportLink" href="#" target="_blank"></a>
                 </div>
             </div>
             
             <div id="uploadError" style="background: #ef4444; color: white; padding: 20px; border-radius: 8px; margin-top: 20px; display: none;">
-                <h3>Lỗi khi tạo báo cáo</h3>
+                <h3>Error generating report</h3>
                 <p id="uploadErrorMessage"></p>
             </div>
             
             <div id="extractInfo" style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin-top: 15px; display: none;">
-                <h4>Thông tin file:</h4>
+                <h4>File information:</h4>
                 <p id="extractInfoText"></p>
             </div>
         </div>
@@ -800,8 +805,8 @@
         <div id="loadingOverlay" class="loading-overlay">
             <div class="loading-content">
                 <div class="loading-spinner"></div>
-                <div class="loading-text" id="loadingText">Đang xử lý...</div>
-                <div class="loading-description" id="loadingDescription">Vui lòng đợi trong giây lát</div>
+                <div class="loading-text" id="loadingText">Processing...</div>
+                <div class="loading-description" id="loadingDescription">Please wait a moment</div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
@@ -809,12 +814,26 @@
         </div>
         
         <div class="main-card">
-            <h2>📁 Danh sách Reports</h2>
+            <h2>Reports List</h2>
             <div id="reportsList" class="reports-list"></div>
         </div>
     </div>
     
     <script>
+        // Prevent back button to login page after successful login
+        (function() {
+            if (window.history && window.history.pushState) {
+                // Add a dummy state to history
+                window.history.pushState('forward', null, window.location.href);
+                
+                // Listen for popstate event (back button)
+                window.addEventListener('popstate', function() {
+                    // Push forward again to prevent going back
+                    window.history.pushState('forward', null, window.location.href);
+                });
+            }
+        })();
+        
         // Load reports on page load
         loadReports();
         
@@ -829,7 +848,7 @@
                 const listDiv = document.getElementById('reportsList');
                 
                 if (reports.length === 0) {
-                    listDiv.innerHTML = '<p style="color: #999;">Chưa có report nào</p>';
+                    listDiv.innerHTML = '<p style="color: #999;">No reports yet</p>';
                     return;
                 }
                 
@@ -848,13 +867,13 @@
             // Replace 0.0.0.0 with localhost if present
             const fixedText = text.replace('0.0.0.0', 'localhost');
             navigator.clipboard.writeText(fixedText).then(() => {
-                alert('✅ Đã copy link!');
+                alert('✅ Link copied!');
             }).catch(err => {
                 console.error('Copy failed:', err);
             });
         }
         
-        function showLoading(text = 'Đang xử lý...', description = 'Vui lòng đợi trong giây lát') {
+        function showLoading(text = 'Processing...', description = 'Please wait a moment') {
             document.getElementById('loadingText').textContent = text;
             document.getElementById('loadingDescription').textContent = description;
             document.getElementById('progressFill').style.width = '0%';
@@ -892,7 +911,7 @@
             e.preventDefault();
             
             if (!uploadedFile) {
-                alert('Vui lòng upload file và extract topics trước');
+                alert('Please upload file and extract topics first');
                 return;
             }
             
@@ -907,7 +926,7 @@
             
             // Validate inputs
             if (!brandName || !reportName || !reportDate) {
-                alert('Vui lòng điền đầy đủ thông tin');
+                alert('Please fill in all required information');
                 return;
             }
             
@@ -928,13 +947,13 @@
             // Show loading state
             const submitBtn = e.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Đang xử lý...';
+            submitBtn.textContent = 'Processing...';
             submitBtn.disabled = true;
             
             // Show loading overlay with detailed message
             showLoading(
-                'Đang tạo báo cáo...', 
-                'Đang gửi dữ liệu đến API và tạo báo cáo. Quá trình này có thể mất vài phút.'
+                'Generating report...', 
+                'Sending data to API and generating report. This process may take a few minutes.'
             );
             
             // Hide previous messages
@@ -993,11 +1012,11 @@
                 
                 // Provide more specific error messages
                 if (error.message.includes('fetch')) {
-                    errorMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                    errorMessage = 'Cannot connect to server. Please check your network connection.';
                 } else if (error.message.includes('timeout')) {
-                    errorMessage = 'Yêu cầu bị timeout. API có thể đang quá tải, vui lòng thử lại sau.';
+                    errorMessage = 'Request timed out. API may be overloaded, please try again later.';
                 } else if (error.message.includes('invalid response')) {
-                    errorMessage = 'Server trả về dữ liệu không hợp lệ. Vui lòng thử lại.';
+                    errorMessage = 'Server returned invalid data. Please try again.';
                 }
                 
                 document.getElementById('uploadErrorMessage').textContent = errorMessage;
@@ -1044,7 +1063,7 @@
             const fileInput = document.getElementById('excelFile');
             
             if (!fileInput.files[0]) {
-                alert('Vui lòng chọn file Excel trước');
+                alert('Please select an Excel file first');
                 return;
             }
             
@@ -1056,11 +1075,11 @@
             // Show loading state
             const extractBtn = document.querySelector('button[onclick="extractTopics()"]');
             const originalText = extractBtn.textContent;
-            extractBtn.textContent = 'Đang xử lý...';
+            extractBtn.textContent = 'Processing...';
             extractBtn.disabled = true;
             
             // Show loading overlay
-            showLoading('Đang phân tích file Excel...', 'Đang trích xuất danh sách topics từ file của bạn');
+            showLoading('Analyzing Excel file...', 'Extracting topics list from your file');
             
             // Hide previous messages
             document.getElementById('extractInfo').style.display = 'none';
@@ -1077,7 +1096,7 @@
                 if (data.success) {
                     // Populate dropdown with topics
                     const dropdown = document.getElementById('topicDropdown');
-                    dropdown.innerHTML = '<option value="">-- Chọn topic --</option>';
+                    dropdown.innerHTML = '<option value="">-- Select topic --</option>';
                     
                     data.topics.forEach(topic => {
                         const option = document.createElement('option');
@@ -1091,17 +1110,17 @@
                     
                     // Show file info
                     document.getElementById('extractInfoText').textContent = 
-                        `Tìm thấy ${data.total_topics} topics từ ${data.total_rows} dòng dữ liệu`;
+                        `Found ${data.total_topics} topics from ${data.total_rows} data rows`;
                     document.getElementById('extractInfo').style.display = 'block';
                     
                 } else {
-                    alert('Lỗi: ' + (data.error || 'Unknown error'));
+                    alert('Error: ' + (data.error || 'Unknown error'));
                     if (data.available_columns) {
-                        alert('Các cột có sẵn: ' + data.available_columns.join(', '));
+                        alert('Available columns: ' + data.available_columns.join(', '));
                     }
                 }
             } catch (error) {
-                alert('Lỗi kết nối: ' + error.message);
+                alert('Connection error: ' + error.message);
             } finally {
                 // Hide loading
                 hideLoading();
@@ -1116,7 +1135,7 @@
             const selectedTopic = document.getElementById('topicDropdown').value;
             
             if (!selectedTopic) {
-                alert('Vui lòng chọn một topic');
+                alert('Please select a topic');
                 return;
             }
             
@@ -1163,7 +1182,7 @@
                 
                 // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.');
+                    alert('File too large! Please select a file smaller than 5MB.');
                     input.value = '';
                     return;
                 }
@@ -1171,7 +1190,7 @@
                 // Validate file type
                 const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
                 if (!allowedTypes.includes(file.type)) {
-                    alert('Định dạng file không được hỗ trợ! Vui lòng chọn file PNG, JPG, JPEG hoặc SVG.');
+                    alert('Unsupported file format! Please select PNG, JPG, JPEG or SVG file.');
                     input.value = '';
                     return;
                 }

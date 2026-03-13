@@ -1,18 +1,28 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, make_response
 import os
 import json
 import uuid
 import requests
 import re
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import base64
 from dotenv import load_dotenv
+from functools import wraps
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+
+# Configure for reverse proxy
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+# Configure application root for reverse proxy
+APPLICATION_ROOT = os.getenv('APPLICATION_ROOT', '/daily')
+if APPLICATION_ROOT != '/':
+    app.config['APPLICATION_ROOT'] = APPLICATION_ROOT
 
 # Configuration from environment variables
 API_BASE_URL = os.getenv('API_BASE_URL', 'http://148.113.218.245:8524')
@@ -23,6 +33,39 @@ API_TIMEOUT = int(os.getenv('API_TIMEOUT', '300'))
 HOST = os.getenv('HOST', '0.0.0.0')
 PORT = int(os.getenv('PORT', '8000'))
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+# Deployment configuration
+DEPLOYMENT_ENV = os.getenv('DEPLOYMENT_ENV', 'development')
+EXTERNAL_URL = os.getenv('EXTERNAL_URL', APP_BASE_URL)
+
+# Authentication configuration
+LOGIN_USERNAME = os.getenv('LOGIN_USERNAME', 'admin')
+LOGIN_PASSWORD = os.getenv('LOGIN_PASSWORD', 'password')
+SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-this')
+
+# Flask configuration
+app.secret_key = SECRET_KEY
+app.permanent_session_lifetime = timedelta(minutes=60)  # 60 minutes session
+
+# Context processor to provide external URL to templates
+@app.context_processor
+def inject_external_url():
+    return {
+        'external_url': EXTERNAL_URL,
+        'deployment_env': DEPLOYMENT_ENV
+    }
+
+# Add no-cache headers for protected routes
+@app.after_request
+def add_no_cache_headers(response):
+    # Only add no-cache headers for HTML pages that require login
+    if (request.endpoint and 
+        request.endpoint not in ['login', 'static'] and 
+        'logged_in' in session and session['logged_in']):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 # Custom filter to convert markdown links to HTML
 @app.template_filter('markdown_links')
@@ -43,16 +86,82 @@ def markdown_links_filter(text):
     result = re.sub(pattern, replace_link, text)
     return result
 
+# Authentication decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session or not session['logged_in']:
+            return redirect(url_for('login'))
+        
+        # Check if session is expired
+        if 'login_time' in session:
+            login_time = datetime.fromisoformat(session['login_time'])
+            if datetime.now() - login_time > timedelta(minutes=60):
+                session.clear()
+                return redirect(url_for('login'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
 REPORTS_DIR = 'reports'
 LOGOS_DIR = 'static/logos'
 os.makedirs(REPORTS_DIR, exist_ok=True)
 os.makedirs(LOGOS_DIR, exist_ok=True)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == LOGIN_USERNAME and password == LOGIN_PASSWORD:
+            session.permanent = True
+            session['logged_in'] = True
+            session['username'] = username
+            session['login_time'] = datetime.now().isoformat()
+            
+            # Redirect to the page user was trying to access, or home
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('index'))
+        else:
+            response = make_response(render_template('login.html', error='Invalid username or password'))
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
+    
+    # If already logged in, redirect to home
+    if 'logged_in' in session and session['logged_in']:
+        return redirect(url_for('index'))
+    
+    response = make_response(render_template('login.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    response = make_response(redirect(url_for('login')))
+    # Clear cache to prevent back button access
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    # Prevent caching to avoid back button issues
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api/test-connection')
+@login_required
 def test_connection():
     """Test connection to external API"""
     try:
@@ -104,6 +213,7 @@ def test_connection():
         })
 
 @app.route('/api/test-logo-upload', methods=['POST'])
+@login_required
 def test_logo_upload():
     """Test logo upload functionality"""
     try:
@@ -139,6 +249,7 @@ def test_logo_upload():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/static/logos/<filename>')
+@login_required
 def serve_logo(filename):
     """Serve logo files"""
     try:
@@ -153,6 +264,7 @@ def serve_logo(filename):
         return "Error serving logo", 500
 
 @app.route('/api/extract-topics', methods=['POST'])
+@login_required
 def extract_topics():
     """Extract unique topics from uploaded Excel file"""
     try:
@@ -199,6 +311,7 @@ def extract_topics():
         return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
 
 @app.route('/api/generate-from-upload', methods=['POST'])
+@login_required
 def generate_from_upload():
     """Generate report by uploading file to external API"""
     try:
@@ -326,6 +439,21 @@ def generate_from_upload():
         if logo_url:
             api_data['report_metadata']['brand_logo'] = logo_url
         
+        # Reorder slide_1 data: buzz -> post -> comments
+        if 'slide_1' in api_data and 'data' in api_data['slide_1']:
+            slide_1_data = api_data['slide_1']['data']
+            
+            # Create a mapping for desired order
+            order_mapping = {'buzz': 0, 'post': 1, 'comments': 2}
+            
+            # Sort the data based on the type field
+            api_data['slide_1']['data'] = sorted(
+                slide_1_data, 
+                key=lambda x: order_mapping.get(x.get('type', 'unknown'), 999)
+            )
+            
+            print("Slide 1 data reordered successfully")
+        
         # Generate HTML report using template
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
         # Use report_name for filename instead of brand_name
@@ -380,12 +508,28 @@ def generate_from_upload():
         return jsonify({'error': f'Unexpected server error: {str(e)}'}), 500
 
 @app.route('/generate-report')
+@login_required
 def generate_report():
     """Generate report from data.json using template"""
     try:
         # Load data from JSON file
         with open('data.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
+        
+        # Reorder slide_1 data: buzz -> post -> comments
+        if 'slide_1' in data and 'data' in data['slide_1']:
+            slide_1_data = data['slide_1']['data']
+            
+            # Create a mapping for desired order
+            order_mapping = {'buzz': 0, 'post': 1, 'comments': 2}
+            
+            # Sort the data based on the type field
+            data['slide_1']['data'] = sorted(
+                slide_1_data, 
+                key=lambda x: order_mapping.get(x.get('type', 'unknown'), 999)
+            )
+            
+            print("Slide 1 data reordered successfully")
         
         # Generate HTML report using template
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -420,6 +564,7 @@ def generate_report():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/preview')
+@login_required
 def preview_report():
     """Preview report without saving"""
     try:
@@ -427,12 +572,26 @@ def preview_report():
         with open('data.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
         
+        # Reorder slide_1 data: buzz -> post -> comments
+        if 'slide_1' in data and 'data' in data['slide_1']:
+            slide_1_data = data['slide_1']['data']
+            
+            # Create a mapping for desired order
+            order_mapping = {'buzz': 0, 'post': 1, 'comments': 2}
+            
+            # Sort the data based on the type field
+            data['slide_1']['data'] = sorted(
+                slide_1_data, 
+                key=lambda x: order_mapping.get(x.get('type', 'unknown'), 999)
+            )
+        
         # Render template directly for preview
         return render_template('report_template.html', **data)
     except Exception as e:
         return f"Error loading preview: {str(e)}", 500
 
 @app.route('/api/save', methods=['POST'])
+@login_required
 def save_report():
     data = request.json
     html_content = data.get('html', '')
@@ -475,6 +634,7 @@ def view_report(filename):
     return "Report not found", 404
 
 @app.route('/api/reports')
+@login_required
 def list_reports():
     files = os.listdir(REPORTS_DIR)
     reports = [{'filename': f, 'url': f"/report/{f}"} for f in files if f.endswith('.html')]
@@ -485,4 +645,7 @@ if __name__ == '__main__':
     print(f"API Base URL: {API_BASE_URL}")
     print(f"App Base URL: {APP_BASE_URL}")
     print(f"Debug mode: {DEBUG}")
+    print(f"Login URL: http://localhost:{PORT}/login")
+    print(f"Login Username: {LOGIN_USERNAME}")
+    print("=" * 50)
     app.run(host=HOST, port=PORT, debug=DEBUG, threaded=True)

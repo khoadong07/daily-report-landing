@@ -820,7 +820,7 @@
     {% if report_metadata.brand_logo %}
       <img src="{{ report_metadata.brand_logo }}" alt="{{ report_metadata.brand }}" class="cover-logo">
     {% endif %}
-    <div class="cover-title">{{ report_metadata.report_name if report_metadata.report_name else 'Daily Report' }}<br>{{ report_metadata.brand }}</div>
+    <div class="cover-title">{{ report_metadata.report_name if report_metadata.report_name else 'Daily Report' }}</div>
     <div class="cover-date">{{ report_metadata.report_date }}</div>
     <div class="cover-author">Được tạo bởi Kompa.ai</div>
   </div>
