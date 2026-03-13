@@ -5,6 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Report Manager</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #4BADED;
+            --primary-dark: #3A9BD8;
+            --primary-light: #5CB8F2;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,117 +46,257 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, rgba(75, 173, 237, 0.9) 0%, rgba(118, 75, 162, 0.8) 50%, rgba(37, 99, 235, 0.9) 100%), url('https://kompa.ai/wp-content/uploads/2022/11/bn-1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             min-height: 100vh;
-            padding: 20px;
+            padding: 1.5rem;
+            color: var(--gray-800);
+            line-height: 1.6;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
         .header {
             text-align: center;
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
         }
         
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 1.125rem;
+            font-weight: 500;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .main-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-bottom: 20px;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        .main-card h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .main-card > p {
+            color: var(--gray-600);
+            font-size: 1rem;
+            margin-bottom: 2rem;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
         
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         
-        input[type="text"] {
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="file"],
+        select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            background: var(--white);
+            color: var(--gray-800);
         }
         
-        input[type="text"]:focus {
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="file"]:focus,
+        select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        input[type="file"] {
+            padding: 0.75rem;
+            border-style: dashed;
+            background: var(--gray-50);
+            transition: all 0.2s ease;
+        }
+        
+        input[type="file"]:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
         }
         
         textarea {
             width: 100%;
             min-height: 300px;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.875rem;
             resize: vertical;
-            transition: border-color 0.3s;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
         }
         
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: var(--white);
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            padding: 14px 32px;
-            font-size: 16px;
+            padding: 0.875rem 1.75rem;
+            font-size: 1rem;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn:active {
             transform: translateY(0);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn.secondary {
+            background: var(--gray-600);
+            color: white;
+        }
+        
+        .btn.secondary:hover {
+            background: var(--gray-700);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: var(--shadow-sm) !important;
         }
         
         .success-message {
-            background: #10b981;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-top: 1.5rem;
             display: none;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .success-message.show {
             display: block;
-            animation: slideIn 0.3s ease-out;
+            animation: slideInUp 0.4s ease-out;
         }
         
-        @keyframes slideIn {
+        .success-message h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes slideInUp {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -131,17 +305,20 @@
         }
         
         .link-box {
-            background: #f3f4f6;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-top: 1rem;
             word-break: break-all;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
         
         .link-box a {
-            color: #667eea;
+            color: white;
             text-decoration: none;
             font-weight: 600;
+            font-size: 0.875rem;
         }
         
         .link-box a:hover {
@@ -149,69 +326,485 @@
         }
         
         .reports-list {
-            margin-top: 20px;
+            margin-top: 1.5rem;
         }
         
         .report-item {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            background: var(--gray-50);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+            gap: 1rem;
+        }
+        
+        .report-item:hover {
+            background: var(--white);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
         
         .report-item a {
-            color: #667eea;
+            color: var(--primary);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+        
+        .report-item a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
         }
         
         .copy-btn {
-            background: #667eea;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            flex-shrink: 0;
         }
         
         .copy-btn:hover {
-            background: #5568d3;
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        
+        .roadmap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem 0;
+            position: relative;
+        }
+        
+        .roadmap::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: 1;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background: var(--gray-200);
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin: 0 auto 0.75rem;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border: 3px solid var(--white);
+            box-shadow: var(--shadow);
+        }
+        
+        .step.active .step-circle {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .step.completed .step-circle {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .step-title {
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .step.active .step-title {
+            color: var(--primary);
+        }
+        
+        .step.completed .step-title {
+            color: var(--success);
+        }
+        
+        .step-description {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+        
+        .form-step {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            background: var(--gray-50);
+            display: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+            animation: fadeInUp 0.4s ease-out;
+            background: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .form-step h3 {
+            color: var(--gray-900);
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .loading-content {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            max-width: 28rem;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .loading-spinner {
+            width: 4rem;
+            height: 4rem;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+        }
+        
+        .loading-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: var(--gray-200);
+            border-radius: var(--radius);
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: var(--radius);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        #uploadError {
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-top: 1.5rem;
+            display: none;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #uploadError h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        #extractInfo {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            margin-top: 1rem;
+            display: none;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #extractInfo h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .flex-gap {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .roadmap {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .roadmap::before {
+                display: none;
+            }
+            
+            .step {
+                flex: none;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .flex-gap {
+                flex-direction: column;
+            }
+            
+            .form-step {
+                padding: 1.5rem;
+            }
+            
+            .loading-content {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-card {
+                padding: 1rem;
+            }
+            
+            .form-step {
+                padding: 1rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.875rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Daily Report Manager</h1>
-            <p>Paste HTML và tạo landing page ngay lập tức</p>
+            <img src="https://kompa.ai/assets/images/logo.svg" alt="Kompa.ai" style="height: 3rem; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+            <h1>Report Generator</h1>
+            <p>Tạo báo cáo từ file Excel với 3 bước đơn giản</p>
         </div>
         
         <div class="main-card">
-            <form id="reportForm">
-                <div class="form-group">
-                    <label for="title">Tên Report:</label>
-                    <input type="text" id="title" name="title" placeholder="vd: nganh-xang-dau" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="htmlContent">HTML Content:</label>
-                    <textarea id="htmlContent" name="htmlContent" placeholder="Paste HTML code vào đây..." required></textarea>
-                </div>
-                
-                <button type="submit" class="btn">💾 Save & Create Landing Page</button>
-            </form>
+            <h2>Generate Report from Excel File</h2>
+            <p style="margin-bottom: 30px; color: #666;">Upload file Excel và điền thông tin để tạo báo cáo từ API</p>
             
-            <div id="successMessage" class="success-message">
-                <h3>✅ Tạo thành công!</h3>
+            <!-- Road Map -->
+            <div class="roadmap">
+                <div class="step active" id="roadmap-step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-title">Upload File</div>
+                    <div class="step-description">Chọn file Excel</div>
+                </div>
+                <div class="step" id="roadmap-step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-title">Cấu hình</div>
+                    <div class="step-description">Thiết lập thông tin</div>
+                </div>
+                <div class="step" id="roadmap-step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-title">Tạo Report</div>
+                    <div class="step-description">Hoàn thành báo cáo</div>
+                </div>
+            </div>
+            
+            <!-- Step 1: File Upload and Topic Extraction -->
+            <div id="step1" class="form-step active">
+                <h3>Bước 1: Upload file và chọn Topic</h3>
+                <div class="form-group">
+                    <label for="excelFile">Excel File:</label>
+                    <input type="file" id="excelFile" name="file" accept=".xlsx,.xls" required style="padding: 8px;">
+                    <button type="button" class="btn" onclick="extractTopics()" style="margin-top: 10px; padding: 8px 16px; font-size: 14px;">Extract Topics</button>
+                </div>
+                
+                <div id="topicSelection" style="display: none;">
+                    <div class="form-group">
+                        <label for="topicDropdown">Chọn Brand Name từ Topics:</label>
+                        <select id="topicDropdown" style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; width: 100%;">
+                            <option value="">-- Chọn topic --</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn" onclick="showStep2()">Tiếp tục bước 2</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Report Configuration -->
+            <div id="step2" class="form-step">
+                <h3>Bước 2: Cấu hình báo cáo</h3>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="hidden" id="selectedTopic" name="brand_name">
+                    
+                    <div class="form-group">
+                        <label for="reportName">Tên Report:</label>
+                        <input type="text" id="reportName" name="report_name" placeholder="vd: Báo cáo ngành xăng dầu" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="brandLogo">Logo Thương hiệu (không bắt buộc):</label>
+                        <input type="file" id="brandLogo" name="brand_logo" accept=".png,.jpg,.jpeg,.svg" style="padding: 8px;" onchange="previewLogo(this)">
+                        <small style="color: var(--gray-500); font-size: 0.75rem; margin-top: 0.5rem; display: block;">
+                            Chấp nhận file PNG, JPG, JPEG, SVG. Kích thước tối ưu: 200x60px
+                        </small>
+                        <div id="logoPreview" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius); border: 1px solid var(--gray-200);">
+                            <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-height: 60px; max-width: 200px; object-fit: contain;">
+                            <button type="button" onclick="removeLogo()" style="margin-left: 1rem; padding: 0.25rem 0.5rem; background: var(--error); color: white; border: none; border-radius: var(--radius-sm); font-size: 0.75rem; cursor: pointer;">✕ Xóa</button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="grid-2">
+                        <div class="form-group">
+                            <label for="reportDate">Report Date:</label>
+                            <input type="date" id="reportDate" name="report_date" required style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reportTime">Report Time:</label>
+                            <input type="time" id="reportTime" name="report_time" value="10:00" required style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                        </div>
+                    </div>
+                    
+                    <div class="flex-gap">
+                        <button type="button" class="btn secondary" onclick="showStep1()">Quay lại</button>
+                        <button type="submit" class="btn">Tạo Report</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="uploadMessage" class="success-message">
+                <h3>Tạo báo cáo từ API thành công!</h3>
                 <div class="link-box">
                     <strong>Link truy cập:</strong><br>
-                    <a id="reportLink" href="#" target="_blank"></a>
+                    <a id="uploadReportLink" href="#" target="_blank"></a>
                 </div>
-                <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
+            </div>
+            
+            <div id="uploadError" style="background: #ef4444; color: white; padding: 20px; border-radius: 8px; margin-top: 20px; display: none;">
+                <h3>Lỗi khi tạo báo cáo</h3>
+                <p id="uploadErrorMessage"></p>
+            </div>
+            
+            <div id="extractInfo" style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin-top: 15px; display: none;">
+                <h4>Thông tin file:</h4>
+                <p id="extractInfoText"></p>
+            </div>
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <div class="loading-text" id="loadingText">Đang xử lý...</div>
+                <div class="loading-description" id="loadingDescription">Vui lòng đợi trong giây lát</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
             </div>
         </div>
         
@@ -225,42 +818,8 @@
         // Load reports on page load
         loadReports();
         
-        document.getElementById('reportForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const title = document.getElementById('title').value;
-            const htmlContent = document.getElementById('htmlContent').value;
-            
-            try {
-                const response = await fetch('/api/save', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ title, html: htmlContent })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    const link = data.full_url;
-                    document.getElementById('reportLink').href = link;
-                    document.getElementById('reportLink').textContent = link;
-                    document.getElementById('successMessage').classList.add('show');
-                    
-                    // Clear form
-                    document.getElementById('reportForm').reset();
-                    
-                    // Reload reports list
-                    loadReports();
-                    
-                    // Scroll to success message
-                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (error) {
-                alert('Có lỗi xảy ra: ' + error.message);
-            }
-        });
+        // Set default date to today
+        document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
         
         async function loadReports() {
             try {
@@ -285,11 +844,6 @@
             }
         }
         
-        function copyLink() {
-            const link = document.getElementById('reportLink').textContent;
-            copyToClipboard(link);
-        }
-        
         function copyToClipboard(text) {
             // Replace 0.0.0.0 with localhost if present
             const fixedText = text.replace('0.0.0.0', 'localhost');
@@ -298,6 +852,344 @@
             }).catch(err => {
                 console.error('Copy failed:', err);
             });
+        }
+        
+        function showLoading(text = 'Đang xử lý...', description = 'Vui lòng đợi trong giây lát') {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingDescription').textContent = description;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('loadingOverlay').classList.add('show');
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                document.getElementById('progressFill').style.width = progress + '%';
+            }, 500);
+            
+            // Store interval ID to clear later
+            window.currentProgressInterval = progressInterval;
+        }
+        
+        function hideLoading() {
+            // Complete progress bar
+            document.getElementById('progressFill').style.width = '100%';
+            
+            // Clear progress interval
+            if (window.currentProgressInterval) {
+                clearInterval(window.currentProgressInterval);
+            }
+            
+            // Hide loading after a short delay
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.remove('show');
+            }, 500);
+        }
+        
+        // Handle upload form submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!uploadedFile) {
+                alert('Vui lòng upload file và extract topics trước');
+                return;
+            }
+            
+            // Update roadmap to step 3
+            updateRoadmap(3);
+            
+            const formData = new FormData();
+            const brandName = document.getElementById('selectedTopic').value;
+            const reportName = document.getElementById('reportName').value;
+            const reportDate = document.getElementById('reportDate').value;
+            const reportTime = document.getElementById('reportTime').value;
+            
+            // Validate inputs
+            if (!brandName || !reportName || !reportDate) {
+                alert('Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+            
+            // Prepare form data with the previously uploaded file
+            formData.append('file', uploadedFile);
+            formData.append('brand_name', brandName);
+            formData.append('report_name', reportName);
+            formData.append('report_date', reportDate);
+            formData.append('report_time', reportTime);
+            
+            // Add logo file if selected
+            const logoFile = document.getElementById('brandLogo').files[0];
+            if (logoFile) {
+                formData.append('brand_logo', logoFile);
+                console.log('Logo file added:', logoFile.name);
+            }
+            
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Đang xử lý...';
+            submitBtn.disabled = true;
+            
+            // Show loading overlay with detailed message
+            showLoading(
+                'Đang tạo báo cáo...', 
+                'Đang gửi dữ liệu đến API và tạo báo cáo. Quá trình này có thể mất vài phút.'
+            );
+            
+            // Hide previous messages
+            document.getElementById('uploadMessage').classList.remove('show');
+            document.getElementById('uploadError').style.display = 'none';
+            
+            try {
+                console.log('Sending request to /api/generate-from-upload...');
+                
+                const response = await fetch('/api/generate-from-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                let data;
+                try {
+                    data = await response.json();
+                    console.log('Response data:', data);
+                } catch (parseError) {
+                    console.error('Error parsing JSON response:', parseError);
+                    throw new Error('Server returned invalid response format');
+                }
+                
+                if (data.success) {
+                    const link = data.full_url;
+                    document.getElementById('uploadReportLink').href = link;
+                    document.getElementById('uploadReportLink').textContent = link;
+                    document.getElementById('uploadMessage').classList.add('show');
+                    
+                    // Reset to step 1
+                    resetForm();
+                    
+                    // Reload reports list
+                    loadReports();
+                    
+                    // Scroll to success message
+                    setTimeout(() => {
+                        document.getElementById('uploadMessage').scrollIntoView({ behavior: 'smooth' });
+                    }, 600);
+                } else {
+                    // Show error message
+                    const errorMsg = data.error || 'Unknown error occurred';
+                    console.error('API Error:', errorMsg);
+                    document.getElementById('uploadErrorMessage').textContent = errorMsg;
+                    document.getElementById('uploadError').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('uploadError').scrollIntoView({ behavior: 'smooth' });
+                    }, 600);
+                }
+            } catch (error) {
+                console.error('Network/Request Error:', error);
+                // Show error message
+                let errorMessage = 'Network error: ' + error.message;
+                
+                // Provide more specific error messages
+                if (error.message.includes('fetch')) {
+                    errorMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                } else if (error.message.includes('timeout')) {
+                    errorMessage = 'Yêu cầu bị timeout. API có thể đang quá tải, vui lòng thử lại sau.';
+                } else if (error.message.includes('invalid response')) {
+                    errorMessage = 'Server trả về dữ liệu không hợp lệ. Vui lòng thử lại.';
+                }
+                
+                document.getElementById('uploadErrorMessage').textContent = errorMessage;
+                document.getElementById('uploadError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('uploadError').scrollIntoView({ behavior: 'smooth' });
+                }, 600);
+            } finally {
+                // Hide loading
+                hideLoading();
+                
+                // Restore button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function resetForm() {
+            // Reset roadmap to step 1
+            updateRoadmap(1);
+            
+            // Show step 1, hide step 2
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            
+            // Reset form and variables
+            document.getElementById('uploadForm').reset();
+            document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('topicSelection').style.display = 'none';
+            document.getElementById('extractInfo').style.display = 'none';
+            document.getElementById('logoPreview').style.display = 'none';
+            uploadedFile = null;
+        }
+        
+        function copyUploadLink() {
+            const link = document.getElementById('uploadReportLink').textContent;
+            copyToClipboard(link);
+        }
+        
+        // Global variable to store uploaded file
+        let uploadedFile = null;
+        
+        async function extractTopics() {
+            const fileInput = document.getElementById('excelFile');
+            
+            if (!fileInput.files[0]) {
+                alert('Vui lòng chọn file Excel trước');
+                return;
+            }
+            
+            uploadedFile = fileInput.files[0];
+            
+            const formData = new FormData();
+            formData.append('file', uploadedFile);
+            
+            // Show loading state
+            const extractBtn = document.querySelector('button[onclick="extractTopics()"]');
+            const originalText = extractBtn.textContent;
+            extractBtn.textContent = 'Đang xử lý...';
+            extractBtn.disabled = true;
+            
+            // Show loading overlay
+            showLoading('Đang phân tích file Excel...', 'Đang trích xuất danh sách topics từ file của bạn');
+            
+            // Hide previous messages
+            document.getElementById('extractInfo').style.display = 'none';
+            document.getElementById('topicSelection').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/extract-topics', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Populate dropdown with topics
+                    const dropdown = document.getElementById('topicDropdown');
+                    dropdown.innerHTML = '<option value="">-- Chọn topic --</option>';
+                    
+                    data.topics.forEach(topic => {
+                        const option = document.createElement('option');
+                        option.value = topic;
+                        option.textContent = topic;
+                        dropdown.appendChild(option);
+                    });
+                    
+                    // Show topic selection
+                    document.getElementById('topicSelection').style.display = 'block';
+                    
+                    // Show file info
+                    document.getElementById('extractInfoText').textContent = 
+                        `Tìm thấy ${data.total_topics} topics từ ${data.total_rows} dòng dữ liệu`;
+                    document.getElementById('extractInfo').style.display = 'block';
+                    
+                } else {
+                    alert('Lỗi: ' + (data.error || 'Unknown error'));
+                    if (data.available_columns) {
+                        alert('Các cột có sẵn: ' + data.available_columns.join(', '));
+                    }
+                }
+            } catch (error) {
+                alert('Lỗi kết nối: ' + error.message);
+            } finally {
+                // Hide loading
+                hideLoading();
+                
+                // Restore button state
+                extractBtn.textContent = originalText;
+                extractBtn.disabled = false;
+            }
+        }
+        
+        function showStep2() {
+            const selectedTopic = document.getElementById('topicDropdown').value;
+            
+            if (!selectedTopic) {
+                alert('Vui lòng chọn một topic');
+                return;
+            }
+            
+            // Set selected topic to hidden input
+            document.getElementById('selectedTopic').value = selectedTopic;
+            
+            // Update roadmap
+            updateRoadmap(2);
+            
+            // Hide step 1, show step 2
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+        }
+        
+        function showStep1() {
+            // Update roadmap
+            updateRoadmap(1);
+            
+            // Show step 1, hide step 2
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+        }
+        
+        function updateRoadmap(currentStep) {
+            // Reset all steps
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById(`roadmap-step${i}`);
+                step.classList.remove('active', 'completed');
+                
+                if (i < currentStep) {
+                    step.classList.add('completed');
+                } else if (i === currentStep) {
+                    step.classList.add('active');
+                }
+            }
+        }
+        
+        function previewLogo(input) {
+            const preview = document.getElementById('logoPreview');
+            const previewImg = document.getElementById('logoPreviewImg');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.');
+                    input.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Định dạng file không được hỗ trợ! Vui lòng chọn file PNG, JPG, JPEG hoặc SVG.');
+                    input.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+        
+        function removeLogo() {
+            document.getElementById('brandLogo').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
         }
     </script>
 </body>

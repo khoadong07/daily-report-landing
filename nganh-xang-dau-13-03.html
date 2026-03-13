@@ -74,6 +74,8 @@
   }
   .kpi-label { font-size: 13px; color: var(--gray); font-weight: 500; margin-bottom: 12px; }
   .kpi-value { font-size: 42px; font-weight: 800; color: #0f172a; line-height: 1; }
+  .kpi-value.large { font-size: 56px; }
+  .kpi-value.small { font-size: 32px; }
   .kpi-change { margin-top: 10px; font-size: 14px; font-weight: 600; }
   .kpi-change.down { color: var(--red); }
   .kpi-change.up   { color: var(--green); }
@@ -156,6 +158,292 @@
   /* ── DIVIDER ── */
   .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
 
+  /* ── COVER SLIDE ── */
+  .cover-slide {
+    max-width: 1200px; margin: 32px auto;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.1);
+    padding: 80px 48px;
+    scroll-margin-top: 70px;
+    text-align: center;
+    color: white;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover-slide::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="85" cy="20" r="8" fill="%2300bcd4" opacity="0.6"/><circle cx="75" cy="35" r="12" fill="%2300bcd4" opacity="0.4"/><circle cx="90" cy="50" r="6" fill="%2300bcd4" opacity="0.8"/><circle cx="80" cy="65" r="10" fill="%2300bcd4" opacity="0.5"/><circle cx="85" cy="80" r="7" fill="%2300bcd4" opacity="0.7"/></svg>') no-repeat;
+    background-size: 400px 400px;
+    background-position: right center;
+    opacity: 0.3;
+  }
+  .cover-slide .cover-title,
+  .cover-slide .cover-subtitle,
+  .cover-slide .cover-date,
+  .cover-slide .cover-author {
+    position: relative;
+    z-index: 1;
+  }
+  .cover-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .cover-title {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cover-subtitle {
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 32px;
+    opacity: 0.95;
+    max-width: 800px;
+    line-height: 1.3;
+  }
+  .cover-date {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.15);
+    padding: 16px 32px;
+    border-radius: 12px;
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+  }
+  .cover-author {
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 0.9;
+    background: rgba(0,188,212,0.2);
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,188,212,0.3);
+  }
+
+  /* ── CONTACT SLIDE ── */
+  .contact-slide {
+    max-width: 1200px; margin: 32px auto;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0ea5e9 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.1);
+    padding: 80px 48px;
+    scroll-margin-top: 70px;
+    color: white;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-slide::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="85" cy="20" r="8" fill="%2300bcd4" opacity="0.6"/><circle cx="75" cy="35" r="12" fill="%2300bcd4" opacity="0.4"/><circle cx="90" cy="50" r="6" fill="%2300bcd4" opacity="0.8"/><circle cx="80" cy="65" r="10" fill="%2300bcd4" opacity="0.5"/><circle cx="85" cy="80" r="7" fill="%2300bcd4" opacity="0.7"/></svg>') no-repeat;
+    background-size: 400px 400px;
+    background-position: right center;
+    opacity: 0.3;
+  }
+  .contact-content {
+    position: relative;
+    z-index: 1;
+    text-align: left;
+  }
+  .contact-title {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 40px;
+    line-height: 1.1;
+  }
+  .contact-features {
+    list-style: none;
+    margin-bottom: 60px;
+  }
+  .contact-features li {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    padding-left: 32px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .contact-features li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #00bcd4;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .contact-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    max-width: 800px;
+  }
+  .contact-item {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .contact-label {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.8;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .contact-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  /* ── FEATURES GRID ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .feature-icon {
+    font-size: 24px;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 6px;
+    margin-top: 2px;
+  }
+  .feature-content {
+    flex: 1;
+  }
+  .feature-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .feature-desc {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.4;
+  }
+
+  /* ── GLOSSARY ── */
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .glossary-section-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 24px 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  .glossary-section-label:first-child {
+    margin-top: 0;
+  }
+  .gloss-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .gloss-card.cat-discuss { border-left: 4px solid #3b82f6; }
+  .gloss-card.cat-media { border-left: 4px solid #8b5cf6; }
+  .gloss-card.cat-sent { border-left: 4px solid #06b6d4; }
+  .gloss-card.cat-sent-pos { border-left: 4px solid #10b981; }
+  .gloss-card.cat-sent-neu { border-left: 4px solid #6b7280; }
+  .gloss-card.cat-sent-neg { border-left: 4px solid #ef4444; }
+  .gloss-card.cat-insight { border-left: 4px solid #f59e0b; }
+  .gloss-card.cat-brand { border-left: 4px solid #ec4899; }
+  .gloss-card.cat-campaign { border-left: 4px solid #84cc16; }
+  .gloss-icon {
+    font-size: 20px;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .gloss-body {
+    flex: 1;
+  }
+  .gloss-vi {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .gloss-en {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .gloss-desc {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.4;
+  }
+
+  /* ── IMAGE CONTAINER ── */
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 32px 0;
+  }
+  .glossary-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+
   /* ── FOOTER ── */
   footer {
     text-align: center; font-size: 12px; color: var(--gray);
@@ -164,9 +452,24 @@
 
   @media (max-width: 768px) {
     .slide { padding: 24px; margin: 16px; }
+    .cover-slide { padding: 48px 24px; margin: 16px; min-height: 500px; }
+    .contact-slide { padding: 48px 24px; margin: 16px; }
+    .cover-title { font-size: 36px; margin-bottom: 12px; }
+    .cover-subtitle { font-size: 20px; margin-bottom: 24px; }
+    .cover-date { font-size: 16px; padding: 12px 20px; }
+    .cover-author { font-size: 14px; padding: 8px 16px; }
+    .contact-title { font-size: 36px; }
+    .contact-features li { font-size: 16px; padding-left: 24px; }
+    .contact-info { grid-template-columns: 1fr; gap: 16px; max-width: 100%; }
+    .contact-item { padding: 16px; }
+    .features-grid { grid-template-columns: 1fr; gap: 16px; }
+    .glossary-grid { gap: 12px; }
+    .gloss-card { padding: 12px; gap: 10px; }
     .kpi-row { flex-direction: column; align-items: stretch; }
     .two-col { flex-direction: column; }
     .kpi-value { font-size: 32px; }
+    .kpi-value.large { font-size: 42px; }
+    .kpi-value.small { font-size: 24px; }
     .slide-title { font-size: 22px; }
   }
 </style>
@@ -176,12 +479,27 @@
 <!-- NAV -->
 <nav class="nav">
   <span class="nav-brand">📊 Brand Health – Ngành Xăng Dầu</span>
+  <a href="#cover">Trang bìa</a>
   <a href="#slide1">Tổng quan</a>
   <a href="#slide2">Trendline</a>
   <a href="#slide3">Kênh</a>
   <a href="#slide4">Sentiment</a>
-  <a href="#slide5">Top Posts</a>
+  <a href="#slide5">Top posts</a>
+  <a href="#slide6">Thuật ngữ</a>
+  <a href="#slide7">Liên hệ</a>
 </nav>
+
+<!-- ════════════════════════════════════════════
+     COVER SLIDE
+════════════════════════════════════════════ -->
+<section class="cover-slide" id="cover">
+  <div class="cover-content">
+    <div class="cover-title">Daily Report<br>Ngành Xăng Dầu</div>
+    <div class="cover-subtitle">Báo cáo phân tích thương hiệu hàng ngày</div>
+    <div class="cover-date">12/03/2026 09:00 → 13/03/2026 09:00</div>
+    <div class="cover-author">Được tạo bởi Kompa.ai</div>
+  </div>
+</section>
 
 <!-- ════════════════════════════════════════════
      SLIDE 1 – BRAND OVERVIEW
@@ -195,24 +513,24 @@
 
   <div class="kpi-row">
     <div class="kpi-card">
+      <div class="kpi-label">Tổng thảo luận</div>
+      <div class="kpi-value large">15,522</div>
+      <div class="kpi-change down">▼ 53.25%</div>
+    </div>
+    <div class="kpi-card">
       <div class="kpi-label">Tổng bài đăng</div>
-      <div class="kpi-value">2,137</div>
+      <div class="kpi-value small">2,137</div>
       <div class="kpi-change down">▼ 16.52%</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Tổng bình luận</div>
-      <div class="kpi-value">13,385</div>
+      <div class="kpi-value small">13,385</div>
       <div class="kpi-change down">▼ 56.32%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Tổng thảo luận</div>
-      <div class="kpi-value">15,522</div>
-      <div class="kpi-change down">▼ 53.25%</div>
     </div>
   </div>
 
   <div class="insight-box">
-    <div class="insight-label">💡 Insight</div>
+    <div class="insight-label">Insight</div>
     Tổng cộng có 15,522 thảo luận về Ngành Xăng Dầu trong vòng 24 giờ qua, giảm 53.2% so với ngày trước đó
     <a href="http://facebook.com/279119295276925_122251735016251534" target="_blank">[Nguồn]</a>.
     Sự kiện chính là biến động mạnh giá xăng dầu, đỉnh điểm là giá dầu diesel vượt kỷ lục, thúc đẩy người tiêu dùng chuyển sang xe điện
@@ -254,7 +572,7 @@
   </div>
 
   <div class="insight-box">
-    <div class="insight-label">💡 Insight</div>
+    <div class="insight-label">Insight</div>
     Giá xăng dầu thế giới tăng mạnh do căng thẳng tại Trung Đông, vượt mốc 100 USD/thùng và gây sóng gió cho thị trường năng lượng toàn cầu
     <a href="http://facebook.com/100466145018675_1489566719841254" target="_blank">[Nguồn]</a>.
     Bài phân tích sâu rộng về địa chính trị và bảo hiểm năng lượng cho thấy cuộc khủng hoảng eo biển Hormuz đang tác động lớn đến các quốc gia, đặc biệt là châu Âu, và vai trò ngày càng tăng của Mỹ trong việc kiểm soát thị trường này
@@ -283,7 +601,7 @@
   </div>
 
   <div class="insight-box">
-    <div class="insight-label">💡 Insight</div>
+    <div class="insight-label">Insight</div>
     TikTok vẫn là kênh chiếm phần lớn thảo luận về ngành xăng dầu, dù đã ghi nhận mức giảm mạnh 55.99% về số lượng buzz so với ngày hôm qua, cho thấy sự thay đổi trong tâm lý người dùng
     <a href="https://www.tiktok.com/@vtvcab.kinhdoanh/video/7616265352258850069" target="_blank">[Nguồn]</a>.
     Bên cạnh đó, nhiều người dùng đang chia sẻ về các chương trình ưu đãi liên quan đến bảo hiểm xe, có thể do lo ngại biến động giá nhiên liệu
@@ -321,7 +639,7 @@
     <!-- RIGHT: Stacked Bar -->
     <div class="col-50">
       <div class="chart-title">Sắc thái thảo luận theo kênh có lượng thảo luận cao nhất</div>
-      <div class="chart-subtitle">Top kênh theo tổng thảo luận (100% stacked)</div>
+      <div class="chart-subtitle">Top kênh theo tổng thảo luận</div>
       <div class="chart-wrap" style="height:300px;">
         <canvas id="sentStackedChart"></canvas>
       </div>
@@ -329,7 +647,7 @@
   </div>
 
   <div class="insight-box">
-    <div class="insight-label">💡 Insight</div>
+    <div class="insight-label">Insight</div>
     Phân tích sentiment cho thấy sự phân bố không đồng đều, với phần lớn các thảo luận mang tính trung lập (14,427), trong khi sentiment tiêu cực chiếm 856 và tích cực chỉ 230, cho thấy sự thận trọng hoặc thiếu quan tâm của cộng đồng đối với ngành xăng dầu
     <a href="https://vov.vn/thi-truong/gia-xang-dau-tiep-tuc-duoc-dieu-chinh-tu-22h-toi-123-post1275261.vov" target="_blank">[Nguồn]</a>.
     Trên TikTok, sentiment tiêu cực chiếm tỷ lệ đáng kể (208/12,484), cho thấy người dùng trên nền tảng này đặc biệt quan tâm đến các biến động giá và tác động của chúng, trong khi Facebook và YouTube có tỷ lệ tiêu cực thấp hơn nhiều
@@ -422,6 +740,53 @@
     </table>
   </div>
 </section>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 6 – FEATURES
+════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════
+     SLIDE 6 – GLOSSARY (từ ảnh bóc tách)
+════════════════════════════════════════════ -->
+<section class="slide" id="slide6">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 6 / 6</div>
+    <div class="slide-title">Thuật ngữ sử dụng trong báo cáo</div>
+  </div>
+ 
+  <div class="image-container">
+    <img src="/Users/khoadong/Desktop/Khoa/Personal/daily-report-landing/image.jpeg" alt="Thuật ngữ báo cáo" class="glossary-image">
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 7 – CONTACT
+════════════════════════════════════════════ -->
+<section class="contact-slide" id="slide7">
+  <div class="contact-content">
+    <div class="contact-title">Xin cảm ơn!</div>
+    
+    <ul class="contact-features">
+      <li>Tăng trưởng Thương hiệu bền vững cùng Kompa</li>
+      <li>Phát hiện sớm cơ hội - Ứng phó kịp thời rủi ro - Tối ưu hiệu quả truyền thông</li>
+    </ul>
+    
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="contact-label">(Website)</div>
+        <div class="contact-value">kompa.ai</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">(Email)</div>
+        <div class="contact-value">info@kompa.ai</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">(Phone)</div>
+        <div class="contact-value">0902 915 510<br>Ms Như Tran</div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
 
 <footer>Brand Health Analysis &nbsp;·&nbsp; Ngành Xăng Dầu &nbsp;·&nbsp; 12/03/2026 – 13/03/2026 &nbsp;·&nbsp; Powered by Kompa AI</footer>
 

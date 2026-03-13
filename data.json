@@ -1,0 +1,278 @@
+{
+    "report_metadata": {
+            "brand": "Ngành Xăng Dầu",
+            "report_date": "12/03/2026 10:00 → 13/03/2026 10:00",
+            "compare_date": "11/03/2026 10:00 → 12/03/2026 10:00",
+            "generated_at": "2026-03-13T06:06:59.453585",
+            "generation_mode": "parallel",
+            "show_interactions": false,
+            "total_slides": 5
+        },
+        "slide_1": {
+            "title": "Tổng quan về thương hiệu Ngành Xăng Dầu",
+            "subtitle": "Ngày 12/03/2026 10:00 → 13/03/2026 10:00 (so sánh với 11/03/2026 10:00 → 12/03/2026 10:00)",
+            "show_interactions": false,
+            "data": [
+                {
+                    "type": "post",
+                    "label": "Tổng bài đăng",
+                    "today": 1962,
+                    "yesterday": 2534,
+                    "change_pct": -22.57
+                },
+                {
+                    "type": "comments",
+                    "label": "Tổng bình luận",
+                    "today": 12312,
+                    "yesterday": 30097,
+                    "change_pct": -59.09
+                },
+                {
+                    "type": "buzz",
+                    "label": "Tổng thảo luận",
+                    "today": 14274,
+                    "yesterday": 32631,
+                    "change_pct": -56.26
+                }
+            ],
+            "insight": "Tổng cộng có 14274 thảo luận về Ngành Xăng Dầu trong vòng 24 giờ qua, giảm 56.3% so với ngày trước đó [Nguồn](http://facebook.com/100023242184072_2138267760291276). Sự kiện chính là căng thẳng leo thang tại Trung Đông và các cuộc tấn công vào cơ sở hạ tầng dầu mỏ của Iran [Nguồn](http://facebook.com/847517991786334_122121896337143825). Thông tin lan truyền nhanh chóng trên Facebook và TikTok, tập trung vào lo ngại về gián đoạn nguồn cung và tăng giá [Nguồn](https://www.tiktok.com/@xnkhaiquan/video/7616375934689594645). Phản ứng từ cộng đồng chủ yếu thể hiện sự lo lắng về lạm phát và tác động tiêu cực đến kinh tế [Nguồn](http://facebook.com/100012470922463_2482438568848483). Tình hình hiện tại cho thấy nguy cơ giá dầu tiếp tục tăng và có thể dẫn đến khủng hoảng kinh tế toàn cầu [Nguồn](http://facebook.com/100013096001881_2399250247188152)."
+        },
+        "slide_2": {
+            "title": "Trendline | Diễn biến thảo luận",
+            "subtitle": "Khoảng thời gian: 2026-03-05 → 2026-03-13",
+            "window": {
+                "start_date": "2026-03-05",
+                "end_date": "2026-03-13"
+            },
+            "trendline": [
+                {
+                    "date": "2026-03-05",
+                    "buzz": 15389
+                },
+                {
+                    "date": "2026-03-06",
+                    "buzz": 6934
+                },
+                {
+                    "date": "2026-03-07",
+                    "buzz": 32982
+                },
+                {
+                    "date": "2026-03-08",
+                    "buzz": 25368
+                },
+                {
+                    "date": "2026-03-09",
+                    "buzz": 38161
+                },
+                {
+                    "date": "2026-03-10",
+                    "buzz": 41082
+                },
+                {
+                    "date": "2026-03-11",
+                    "buzz": 32399
+                },
+                {
+                    "date": "2026-03-12",
+                    "buzz": 22295
+                },
+                {
+                    "date": "2026-03-13",
+                    "buzz": 1619
+                }
+            ],
+            "peak_day": {
+                "date": "2026-03-10",
+                "buzz": 41082,
+                "links": [
+                    "http://facebook.com/100015772050995_2152037581998623",
+                    "http://facebook.com/101270476078952_895559653311953",
+                    "http://facebook.com/101270476078952_895559603311958"
+                ]
+            },
+            "current_day": {
+                "date": "2026-03-13",
+                "buzz": 1619,
+                "is_still_hot": false
+            },
+            "insight": "Sự kiện chiến tranh Trung Đông và tác động đến giá dầu là nguyên nhân chính dẫn đến 41.082 lượt thảo luận vào ngày 10/03/2026, khi giá xăng dầu Việt Nam leo thang gần 28.000vnđ/lít [Nguồn](http://facebook.com/100015772050995_2152037581998623). Đến 10:00 ngày 13/03/2026, với chỉ 1.619 lượt thảo luận, sự quan tâm của cộng đồng về sự kiện này đã giảm đáng kể, cho thấy mức độ ảnh hưởng đang hạ nhiệt [Nguồn](http://facebook.com/101270476078952_895559653311953). Các thông tin về thị trường chứng khoán và giá USD cũng được cập nhật liên tục, phản ánh sự bất ổn kinh tế do xung đột gây ra [Nguồn](http://facebook.com/101270476078952_895559603311958). Tuy nhiên, số lượng thảo luận thấp hơn cho thấy các chủ đề khác đang thu hút sự chú ý của cộng đồng trực tuyến hơn vào thời điểm hiện tại [Nguồn](http://facebook.com/101270476078952_895559603311958)."
+        },
+        "slide_3": {
+            "title": "Phân tích theo kênh thảo luận",
+            "subtitle": "Ngày 12/03/2026 10:00 → 13/03/2026 10:00 (so sánh với 11/03/2026 10:00 → 12/03/2026 10:00)",
+            "top_channel": "Tiktok",
+            "channel_distribution": [
+                {
+                    "Channel": "Tiktok",
+                    "today_buzz": 11794,
+                    "yesterday_buzz": 28484,
+                    "change_pct": -58.59
+                },
+                {
+                    "Channel": "News",
+                    "today_buzz": 955,
+                    "yesterday_buzz": 900,
+                    "change_pct": 6.11
+                },
+                {
+                    "Channel": "Facebook",
+                    "today_buzz": 932,
+                    "yesterday_buzz": 2390,
+                    "change_pct": -61.0
+                },
+                {
+                    "Channel": "Youtube",
+                    "today_buzz": 478,
+                    "yesterday_buzz": 711,
+                    "change_pct": -32.77
+                },
+                {
+                    "Channel": "Forum",
+                    "today_buzz": 90,
+                    "yesterday_buzz": 114,
+                    "change_pct": -21.05
+                },
+                {
+                    "Channel": "Social",
+                    "today_buzz": 20,
+                    "yesterday_buzz": 19,
+                    "change_pct": 5.26
+                },
+                {
+                    "Channel": "Threads",
+                    "today_buzz": 5,
+                    "yesterday_buzz": 13,
+                    "change_pct": -61.54
+                }
+            ],
+            "insight": "Dưới đây là insight cho slide Channel Breakdown, đáp ứng đầy đủ các yêu cầu đã đề ra:\n\nTiktok vẫn là kênh chiếm phần lớn thảo luận về xăng dầu, dù đã giảm đáng kể so với ngày hôm qua, cho thấy sự quan tâm vẫn còn rất lớn nhưng có dấu hiệu hạ nhiệt [Nguồn](https://www.tiktok.com/@vietnamindex.svg/video/7616385795997306133). Các bài đăng tập trung vào biến động giá dầu thế giới và tác động đến thị trường trong nước, đặc biệt là ngưỡng 100 USD/thùng [Nguồn](https://www.tiktok.com/@vtvcab.kinhdoanh/video/7616265352258850069). Bên cạnh đó, nhiều nội dung phân tích nguyên nhân tăng giảm giá xăng dầu, liên kết với tình hình chiến sự Trung Đông và các yếu tố kinh tế vĩ mô [Nguồn](https://www.tiktok.com/@xnkhaiquan/video/7616375934689594645). Tình hình các cửa hàng xăng dầu đóng cửa hoặc găm hàng cũng được đề cập, tuy nhiên mức độ thảo luận đã giảm so với trước [Nguồn](https://www.tiktok.com/@vietnamindex.svg/video/7616385795997306133). Một số cửa hàng xăng dầu tại Hà Nội đã hoạt động trở lại bình thường, giảm bớt lo ngại về nguồn cung [Nguồn](https://www.tiktok.com/@goc_tin_viet/video/7616218398074227989). Đáng chú ý, VinFast tận dụng tình hình giá xăng tăng để quảng bá các dòng xe điện, đưa ra chính sách ưu đãi hấp dẫn [Nguồn](https://www.tiktok.com/@xemaydienvinfastmytho/video/7616297832865139988). Diễn biến giá dầu tăng mạnh cũng được cập nhật liên tục, gây lo ngại về việc giá xăng dầu thành phẩm có thể tiếp tục biến động [Nguồn](https://www.tiktok.com/@tinhot_360/video/7616232678127439122)."
+        },
+        "slide_4": {
+            "title": "Sentiment & Channel Breakdown",
+            "subtitle": "Khung giờ: 12/03/2026 10:00 → 13/03/2026 10:00",
+            "sentiment_distribution": [
+                {
+                    "Sentiment": "Neutral",
+                    "Count": 13243
+                },
+                {
+                    "Sentiment": "Negative",
+                    "Count": 817
+                },
+                {
+                    "Sentiment": "Positive",
+                    "Count": 199
+                }
+            ],
+            "channel_sentiment": [
+                {
+                    "Channel": "Tiktok",
+                    "Negative": 189.0,
+                    "Neutral": 11536.0,
+                    "Positive": 56.0
+                },
+                {
+                    "Channel": "News",
+                    "Negative": 346.0,
+                    "Neutral": 523.0,
+                    "Positive": 86.0
+                },
+                {
+                    "Channel": "Youtube",
+                    "Negative": 26.0,
+                    "Neutral": 443.0,
+                    "Positive": 7.0
+                },
+                {
+                    "Channel": "Facebook Pages",
+                    "Negative": 89.0,
+                    "Neutral": 259.0,
+                    "Positive": 18.0
+                },
+                {
+                    "Channel": "Facebook Users",
+                    "Negative": 82.0,
+                    "Neutral": 247.0,
+                    "Positive": 15.0
+                },
+                {
+                    "Channel": "Facebook Groups",
+                    "Negative": 53.0,
+                    "Neutral": 152.0,
+                    "Positive": 17.0
+                },
+                {
+                    "Channel": "Forum",
+                    "Negative": 25.0,
+                    "Neutral": 65.0,
+                    "Positive": 0.0
+                },
+                {
+                    "Channel": "Social",
+                    "Negative": 7.0,
+                    "Neutral": 13.0,
+                    "Positive": 0.0
+                }
+            ],
+            "insight": "Tổng quan sentiment cho thấy sự áp đảo của các ý kiến trung lập (13243), chiếm đa số lớn, trong khi sentiment tiêu cực (817) cao hơn đáng kể so với sentiment tích cực (199), cho thấy sự lo ngại hoặc phản ứng tiêu cực chiếm ưu thế trong thảo luận về ngành xăng dầu. [Nguồn](https://vov.vn/thi-truong/gia-xang-dau-tiep-tuc-duoc-dieu-chinh-tu-22h-toi-123-post1275261.vov)\n\nPhân tích theo kênh cho thấy TikTok có số lượng lớn ý kiến trung lập (11536), trong khi Facebook (tổng hợp Pages, Users, Groups) ghi nhận tỷ lệ ý kiến tiêu cực cao hơn so với các kênh khác, cho thấy đây là nơi người dùng thể hiện sự bất mãn hoặc lo lắng nhiều nhất về vấn đề xăng dầu. [Nguồn](https://nguoiquansat.vn/gia-dau-the-gioi-giam-manh-sau-tin-hieu-tu-g7-vi-sao-xang-viet-nam-chua-the-ha-nhiet-ngay-lap-tuc-278756.html)\n\nĐặc biệt, Facebook là nơi lan truyền thông tin về các sự kiện quốc tế gây ảnh hưởng đến nguồn cung dầu, như cáo buộc về cuộc tấn công vào kho xuất dầu Iran, gây ra lo ngại về giá cả và an ninh năng lượng. [Nguồn](http://facebook.com/100023242184072_2138267760291276)\n\nBên cạnh đó, các bài đăng tiêu cực trên News tập trung vào việc điều chỉnh giá xăng dầu trong nước, với nhiều ý kiến thể hiện sự không hài lòng về việc giá tăng, đặc biệt trong bối cảnh giá dầu thế giới có dấu hiệu giảm. [Nguồn](https://vov.vn/thi-truong/gia-xang-dau-tiep-tuc-duoc-dieu-chinh-tu-22h-toi-123-post1275261.vov)\n\nMột nội dung tiêu cực đáng chú ý khác là sự lo ngại về việc giá dầu thế giới giảm mạnh nhưng giá xăng trong nước chưa phản ánh kịp thời, gây khó khăn cho người tiêu dùng và ngư dân. [Nguồn](https://nguoiquansat.vn/gia-dau-the-gioi-giam-manh-sau-tin-hieu-tu-g7-vi-sao-xang-viet-nam-chua-the-ha-nhiet-ngay-lap-tuc-278756.html)\n\nTuy nhiên, cũng có những thông tin tích cực về việc Bộ trưởng Y tế tiếp xúc cử tri và lắng nghe ý kiến để nâng cao chất lượng chăm sóc sức khỏe nhân dân, cho thấy sự quan tâm của chính phủ đến các vấn đề dân sinh. [Nguồn](http://suckhoedoisong.vn/bo-truong-dao-hong-lan-nganh-y-te-luon-lang-nghe-tiep-thu-y-kien-cua-cu-tri-de-nang-cao-hon-cong-tac-cham-soc-suc-khoe-nhan-dan-169260312191018743.htm)"
+        },
+        "slide_5": {
+            "title": "Top 5 bài đăng có lượng bình luận nhiều nhất",
+            "subtitle": "Ngày 12/03/2026 10:00 → 13/03/2026 10:00",
+            "report_date": "12/03/2026 10:00 → 13/03/2026 10:00",
+            "show_interactions": false,
+            "top_posts": [
+                {
+                    "stt": 1,
+                    "noi_dung_bai_dang": "Từ 22h hôm nay (12/3), giá xăng RON 95, dầu diesel cùng tăng #theanh28 #theanh28news #tiktoknews",
+                    "ngay_dang": "2026-03-12 22:40:04",
+                    "kenh": "Tiktok",
+                    "nguoi_dang": "theanh28entertainment",
+                    "url_topic": "https://www.tiktok.com/@theanh28entertainment/video/7616394097636412680",
+                    "comment_count": 525,
+                    "topic_id": "6713788996806706178_7616394097636412680"
+                },
+                {
+                    "stt": 2,
+                    "noi_dung_bai_dang": "GIÁ XĂNG HÔM NAY GIẢM MẠNH, TÀI XẾ TỰ TIN HÔ \"CHO TÔI ĐẦY BÌNH\" #theanh28 #tiktoknews #hanoinews",
+                    "ngay_dang": "2026-03-12 10:17:09",
+                    "kenh": "Tiktok",
+                    "nguoi_dang": "hanoinews.theanh28",
+                    "url_topic": "https://www.tiktok.com/@hanoinews.theanh28/video/7616202807900704020",
+                    "comment_count": 445,
+                    "topic_id": "7098232443631797250_7616202807900704020"
+                },
+                {
+                    "stt": 3,
+                    "noi_dung_bai_dang": "HÀ NỘI: CÂY CĂNG \"KHÁC LẠ\" SAU KHI GIÁ XĂNG DẦU GIẢM MẠNH #theanh28 #60giay #tiktoknews",
+                    "ngay_dang": "2026-03-12 14:34:47",
+                    "kenh": "Tiktok",
+                    "nguoi_dang": "60giay.com",
+                    "url_topic": "https://www.tiktok.com/@60giay.com/video/7616269230245383442",
+                    "comment_count": 297,
+                    "topic_id": "6918910425120818178_7616269230245383442"
+                },
+                {
+                    "stt": 4,
+                    "noi_dung_bai_dang": "Lí do giá xăng giảm mạnh ngày 12/3 #giaxangdau #giaxanggiam #giaxangdauvietnam",
+                    "ngay_dang": "2026-03-12 11:31:57",
+                    "kenh": "Tiktok",
+                    "nguoi_dang": "chienhalo",
+                    "url_topic": "https://www.tiktok.com/@chienhalo/video/7616222155335912711",
+                    "comment_count": 267,
+                    "topic_id": "6801356182038070273_7616222155335912711"
+                },
+                {
+                    "stt": 5,
+                    "noi_dung_bai_dang": "Tôi vô cùng quan ngại sâu sắc trước tình hình xung đột ngày càng leo thang và phức tạp tại khu vực Trung Đông. Tôi kêu gọi các bên liên quan kiềm chế tối đa, chấm dứt ngay các hành động làm gia tăng căng thẳng, nhằm hướng tới hòa bình và ổn định cho các khu vực. Đặc biệt, tôi đề nghị những xung đột ở Trung Đông nhanh chóng chấm dứt để giá xăng dầu giảm xuống. *HÌNH ẢNH ĐƯỢC TẠO BỞI AI*",
+                    "ngay_dang": "2026-03-12 14:10:23",
+                    "kenh": "Tiktok",
+                    "nguoi_dang": "hcb_102",
+                    "url_topic": "https://www.tiktok.com/@hcb_102/video/7616262965272071445",
+                    "comment_count": 209,
+                    "topic_id": "7337479831742137345_7616262965272071445"
+                }
+            ]
+        }
+}
