@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, make_response
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, make_response, Blueprint
 import os
 import json
 import uuid
@@ -19,13 +19,21 @@ app = Flask(__name__)
 # Configure for reverse proxy
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
-# Configure application root for reverse proxy
-APPLICATION_ROOT = os.getenv('APPLICATION_ROOT', '/daily')
-if APPLICATION_ROOT != '/':
-    app.config['APPLICATION_ROOT'] = APPLICATION_ROOT
+# Configure URL prefix for reverse proxy
+URL_PREFIX = os.getenv('APPLICATION_ROOT', '')
+if URL_PREFIX and not URL_PREFIX.startswith('/'):
+    URL_PREFIX = '/' + URL_PREFIX
+if URL_PREFIX == '/':
+    URL_PREFIX = ''
+
+# Create Blueprint with URL prefix if needed
+if URL_PREFIX:
+    bp = Blueprint('main', __name__, url_prefix=URL_PREFIX)
+else:
+    bp = Blueprint('main', __name__)
 
 # Configuration from environment variables
-API_BASE_URL = os.getenv('API_BASE_URL', 'http://148.113.218.245:8524')
+API_BASE_URL = os.getenv('API_BASE_URL')
 API_GENERATE_ENDPOINT = os.getenv('API_GENERATE_ENDPOINT', '/api/generate-daily')
 API_HEALTH_ENDPOINT = os.getenv('API_HEALTH_ENDPOINT', '/health')
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:8000')
@@ -47,12 +55,21 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-this')
 app.secret_key = SECRET_KEY
 app.permanent_session_lifetime = timedelta(minutes=60)  # 60 minutes session
 
+# Helper function to generate URLs with APPLICATION_ROOT
+# Helper function to generate URLs (simplified since we use Blueprint)
+def url_for_with_prefix(endpoint, **values):
+    """Generate URL - Blueprint handles prefix automatically"""
+    if not endpoint.startswith('main.'):
+        endpoint = 'main.' + endpoint
+    return url_for(endpoint, **values)
+
 # Context processor to provide external URL to templates
 @app.context_processor
 def inject_external_url():
     return {
         'external_url': EXTERNAL_URL,
-        'deployment_env': DEPLOYMENT_ENV
+        'deployment_env': DEPLOYMENT_ENV,
+        'url_for_with_prefix': url_for_with_prefix
     }
 
 # Add no-cache headers for protected routes
@@ -91,14 +108,14 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'logged_in' not in session or not session['logged_in']:
-            return redirect(url_for('login'))
+            return redirect(url_for_with_prefix('login'))
         
         # Check if session is expired
         if 'login_time' in session:
             login_time = datetime.fromisoformat(session['login_time'])
             if datetime.now() - login_time > timedelta(minutes=60):
                 session.clear()
-                return redirect(url_for('login'))
+                return redirect(url_for_with_prefix('login'))
         
         return f(*args, **kwargs)
     return decorated_function
@@ -108,7 +125,7 @@ LOGOS_DIR = 'static/logos'
 os.makedirs(REPORTS_DIR, exist_ok=True)
 os.makedirs(LOGOS_DIR, exist_ok=True)
 
-@app.route('/login', methods=['GET', 'POST'])
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -122,7 +139,7 @@ def login():
             
             # Redirect to the page user was trying to access, or home
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('index'))
+            return redirect(next_page or url_for_with_prefix('index'))
         else:
             response = make_response(render_template('login.html', error='Invalid username or password'))
             response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -132,7 +149,7 @@ def login():
     
     # If already logged in, redirect to home
     if 'logged_in' in session and session['logged_in']:
-        return redirect(url_for('index'))
+        return redirect(url_for_with_prefix('index'))
     
     response = make_response(render_template('login.html'))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -140,17 +157,17 @@ def login():
     response.headers['Expires'] = '0'
     return response
 
-@app.route('/logout')
+@bp.route('/logout')
 def logout():
     session.clear()
-    response = make_response(redirect(url_for('login')))
+    response = make_response(redirect(url_for_with_prefix('login')))
     # Clear cache to prevent back button access
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
 
-@app.route('/')
+@bp.route('/')
 @login_required
 def index():
     response = make_response(render_template('index.html'))
@@ -160,7 +177,7 @@ def index():
     response.headers['Expires'] = '0'
     return response
 
-@app.route('/api/test-connection')
+@bp.route('/api/test-connection')
 @login_required
 def test_connection():
     """Test connection to external API"""
@@ -212,7 +229,7 @@ def test_connection():
             'api_url': test_url if 'test_url' in locals() else 'Unknown'
         })
 
-@app.route('/api/test-logo-upload', methods=['POST'])
+@bp.route('/api/test-logo-upload', methods=['POST'])
 @login_required
 def test_logo_upload():
     """Test logo upload functionality"""
@@ -248,7 +265,7 @@ def test_logo_upload():
         print(f"Error in test logo upload: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/static/logos/<filename>')
+@bp.route('/static/logos/<filename>')
 @login_required
 def serve_logo(filename):
     """Serve logo files"""
@@ -263,7 +280,7 @@ def serve_logo(filename):
         print(f"Error serving logo {filename}: {str(e)}")
         return "Error serving logo", 500
 
-@app.route('/api/extract-topics', methods=['POST'])
+@bp.route('/api/extract-topics', methods=['POST'])
 @login_required
 def extract_topics():
     """Extract unique topics from uploaded Excel file"""
@@ -310,7 +327,7 @@ def extract_topics():
     except Exception as e:
         return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
 
-@app.route('/api/generate-from-upload', methods=['POST'])
+@bp.route('/api/generate-from-upload', methods=['POST'])
 @login_required
 def generate_from_upload():
     """Generate report by uploading file to external API"""
@@ -507,7 +524,7 @@ def generate_from_upload():
         traceback.print_exc()
         return jsonify({'error': f'Unexpected server error: {str(e)}'}), 500
 
-@app.route('/generate-report')
+@bp.route('/generate-report')
 @login_required
 def generate_report():
     """Generate report from data.json using template"""
@@ -563,7 +580,7 @@ def generate_report():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/preview')
+@bp.route('/preview')
 @login_required
 def preview_report():
     """Preview report without saving"""
@@ -590,7 +607,7 @@ def preview_report():
     except Exception as e:
         return f"Error loading preview: {str(e)}", 500
 
-@app.route('/api/save', methods=['POST'])
+@bp.route('/api/save', methods=['POST'])
 @login_required
 def save_report():
     data = request.json
@@ -625,7 +642,7 @@ def save_report():
         'full_url': full_url
     })
 
-@app.route('/report/<filename>')
+@bp.route('/report/<filename>')
 def view_report(filename):
     filepath = os.path.join(REPORTS_DIR, filename)
     if os.path.exists(filepath):
@@ -633,19 +650,26 @@ def view_report(filename):
             return f.read()
     return "Report not found", 404
 
-@app.route('/api/reports')
+@bp.route('/api/reports')
 @login_required
 def list_reports():
     files = os.listdir(REPORTS_DIR)
     reports = [{'filename': f, 'url': f"/report/{f}"} for f in files if f.endswith('.html')]
     return jsonify(reports)
 
+# Register Blueprint
+app.register_blueprint(bp)
+
 if __name__ == '__main__':
     print(f"Starting server on {HOST}:{PORT}")
     print(f"API Base URL: {API_BASE_URL}")
     print(f"App Base URL: {APP_BASE_URL}")
+    print(f"URL Prefix: {URL_PREFIX}")
     print(f"Debug mode: {DEBUG}")
-    print(f"Login URL: http://localhost:{PORT}/login")
+    if URL_PREFIX:
+        print(f"Login URL: http://localhost:{PORT}{URL_PREFIX}/login")
+    else:
+        print(f"Login URL: http://localhost:{PORT}/login")
     print(f"Login Username: {LOGIN_USERNAME}")
     print("=" * 50)
     app.run(host=HOST, port=PORT, debug=DEBUG, threaded=True)
