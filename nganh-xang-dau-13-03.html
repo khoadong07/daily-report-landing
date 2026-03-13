@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Health Analysis – Ngành Xăng Dầu</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --primary: #1e40af;
+    --gray: #6b7280;
+    --green: #16a34a;
+    --red: #dc2626;
+    --yellow: #f59e0b;
+    --bg: #ffffff;
+    --bg-light: #f9fafb;
+    --border: #e5e7eb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #e8edf5;
+    color: #1f2937;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: #1e3a8a;
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    flex-wrap: wrap;
+  }
+  .nav-brand { color: #fff; font-weight: 700; font-size: 15px; margin-right: auto; }
+  .nav a {
+    color: #bfdbfe; text-decoration: none; font-size: 13px; font-weight: 500;
+    padding: 6px 14px; border-radius: 6px; transition: background .2s;
+  }
+  .nav a:hover, .nav a.active { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* ── SLIDE WRAPPER ── */
+  .slide {
+    max-width: 1200px; margin: 32px auto;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.1);
+    padding: 48px;
+    scroll-margin-top: 70px;
+  }
+
+  /* ── SLIDE HEADER ── */
+  .slide-header { margin-bottom: 36px; }
+  .slide-number {
+    display: inline-block;
+    background: var(--primary); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+  }
+  .slide-title { font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1.3; }
+  .slide-subtitle { font-size: 13px; color: var(--gray); margin-top: 6px; }
+
+  /* ── KPI CARDS ── */
+  .kpi-row { display: flex; gap: 24px; justify-content: center; margin-bottom: 32px; }
+  .kpi-card {
+    flex: 1; max-width: 300px;
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 24px; text-align: center;
+    background: var(--bg-light);
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .kpi-label { font-size: 13px; color: var(--gray); font-weight: 500; margin-bottom: 12px; }
+  .kpi-value { font-size: 42px; font-weight: 800; color: #0f172a; line-height: 1; }
+  .kpi-change { margin-top: 10px; font-size: 14px; font-weight: 600; }
+  .kpi-change.down { color: var(--red); }
+  .kpi-change.up   { color: var(--green); }
+
+  /* ── INSIGHT BOX ── */
+  .insight-box {
+    background: #eff6ff; border-left: 4px solid var(--primary);
+    border-radius: 8px; padding: 20px 24px;
+    font-size: 13.5px; line-height: 1.75; color: #1e293b;
+  }
+  .insight-box a { color: var(--primary); font-weight: 600; text-decoration: none; }
+  .insight-box a:hover { text-decoration: underline; }
+  .insight-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--primary);
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-wrap { position: relative; width: 100%; margin-bottom: 32px; }
+  .chart-highlight {
+    display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .highlight-card {
+    flex: 1; min-width: 200px;
+    border-radius: 10px; padding: 16px 20px;
+    font-size: 13px; font-weight: 600;
+  }
+  .highlight-card.peak { background: #fef2f2; border: 1px solid #fca5a5; color: var(--red); }
+  .highlight-card.cool { background: #eff6ff; border: 1px solid #93c5fd; color: var(--primary); }
+  .highlight-card .hc-title { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; opacity: .75; margin-bottom: 4px; }
+  .highlight-card .hc-value { font-size: 22px; font-weight: 800; }
+
+  /* ── TWO COLUMN ── */
+  .two-col { display: flex; gap: 32px; margin-bottom: 32px; align-items: flex-start; flex-wrap: wrap; }
+  .col-50 { flex: 1; min-width: 300px; }
+
+  /* ── TOP CHANNEL BADGE ── */
+  .top-channel-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fef9c3; border: 1px solid #fde047;
+    border-radius: 8px; padding: 10px 18px;
+    font-weight: 700; font-size: 14px; color: #78350f;
+    margin-bottom: 24px;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table thead tr th {
+    background: var(--primary); color: #fff;
+    font-weight: 700; font-size: 13px;
+    padding: 14px 16px; text-align: center;
+    border: 1px solid #1d3a8a;
+  }
+  table thead tr th.left { text-align: left; }
+  table tbody tr:nth-child(even) td { background: var(--bg-light); }
+  table tbody tr td {
+    padding: 12px 16px; border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table tbody tr td.center { text-align: center; }
+  table tbody tr td a { color: var(--primary); font-weight: 600; text-decoration: none; }
+  table tbody tr td a:hover { text-decoration: underline; }
+  .channel-tag {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .tag-tiktok { background: #000; }
+  .tag-facebook { background: #1877f2; }
+  .tag-youtube { background: #ff0000; }
+  .tag-news { background: var(--yellow); color: #000; }
+  .tag-forum { background: var(--gray); }
+
+  /* ── SECTION TITLE inside slides ── */
+  .chart-title {
+    font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;
+  }
+  .chart-subtitle { font-size: 12px; color: var(--gray); margin-bottom: 16px; }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; font-size: 12px; color: var(--gray);
+    padding: 24px; margin-top: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 24px; margin: 16px; }
+    .kpi-row { flex-direction: column; align-items: stretch; }
+    .two-col { flex-direction: column; }
+    .kpi-value { font-size: 32px; }
+    .slide-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">📊 Brand Health – Ngành Xăng Dầu</span>
+  <a href="#slide1">Tổng quan</a>
+  <a href="#slide2">Trendline</a>
+  <a href="#slide3">Kênh</a>
+  <a href="#slide4">Sentiment</a>
+  <a href="#slide5">Top Posts</a>
+</nav>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 1 – BRAND OVERVIEW
+════════════════════════════════════════════ -->
+<section class="slide" id="slide1">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 1 / 5</div>
+    <div class="slide-title">Tổng quan về thương hiệu Ngành Xăng Dầu</div>
+    <div class="slide-subtitle">Ngày 12/03/2026 09:00 → 13/03/2026 09:00 &nbsp;|&nbsp; So sánh với 11/03/2026 09:00 → 12/03/2026 09:00</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng bài đăng</div>
+      <div class="kpi-value">2,137</div>
+      <div class="kpi-change down">▼ 16.52%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng bình luận</div>
+      <div class="kpi-value">13,385</div>
+      <div class="kpi-change down">▼ 56.32%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng thảo luận</div>
+      <div class="kpi-value">15,522</div>
+      <div class="kpi-change down">▼ 53.25%</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 Insight</div>
+    Tổng cộng có 15,522 thảo luận về Ngành Xăng Dầu trong vòng 24 giờ qua, giảm 53.2% so với ngày trước đó
+    <a href="http://facebook.com/279119295276925_122251735016251534" target="_blank">[Nguồn]</a>.
+    Sự kiện chính là biến động mạnh giá xăng dầu, đỉnh điểm là giá dầu diesel vượt kỷ lục, thúc đẩy người tiêu dùng chuyển sang xe điện
+    <a href="http://facebook.com/279119295276925_122251735016251534" target="_blank">[Nguồn]</a>.
+    Thông tin lan truyền nhanh chóng trên Facebook, đặc biệt qua các bài phân tích về tình hình chính trị và kinh tế
+    <a href="https://www.youtube.com/watch?v=ZgZg46cP6OE" target="_blank">[Nguồn]</a>.
+    Phản ứng từ cộng đồng chủ yếu thể hiện sự lo ngại về chi phí sinh hoạt và tác động đến nền kinh tế
+    <a href="http://facebook.com/100029645713748_1652871342377707" target="_blank">[Nguồn]</a>.
+    Tình hình hiện tại cho thấy sự bất ổn trên thị trường năng lượng có thể kéo dài, ảnh hưởng đến nhiều lĩnh vực kinh tế - xã hội
+    <a href="https://fireant.vn/bai-viet/79d0f380-bd0b-4e78-996c-b472a4f04878/38821408" target="_blank">[Nguồn]</a>.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 2 – TRENDLINE
+════════════════════════════════════════════ -->
+<section class="slide" id="slide2">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 2 / 5</div>
+    <div class="slide-title">Trendline | Diễn biến thảo luận</div>
+    <div class="slide-subtitle">Khoảng thời gian: 2026-03-05 → 2026-03-13</div>
+  </div>
+
+  <div class="chart-highlight">
+    <div class="highlight-card peak">
+      <div class="hc-title">🔥 Đỉnh thảo luận</div>
+      <div class="hc-value">41,082</div>
+      <div style="margin-top:4px;font-size:12px;">Ngày 10/03/2026</div>
+    </div>
+    <div class="highlight-card cool">
+      <div class="hc-title">❄️ Trạng thái hiện tại</div>
+      <div class="hc-value">1,619</div>
+      <div style="margin-top:4px;font-size:12px;">Ngày 13/03/2026 – Đã hạ nhiệt</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap" style="height:320px;">
+    <canvas id="trendChart"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 Insight</div>
+    Giá xăng dầu thế giới tăng mạnh do căng thẳng tại Trung Đông, vượt mốc 100 USD/thùng và gây sóng gió cho thị trường năng lượng toàn cầu
+    <a href="http://facebook.com/100466145018675_1489566719841254" target="_blank">[Nguồn]</a>.
+    Bài phân tích sâu rộng về địa chính trị và bảo hiểm năng lượng cho thấy cuộc khủng hoảng eo biển Hormuz đang tác động lớn đến các quốc gia, đặc biệt là châu Âu, và vai trò ngày càng tăng của Mỹ trong việc kiểm soát thị trường này
+    <a href="http://facebook.com/61555944120220_122294565506198137" target="_blank">[Nguồn]</a>.
+    Mặc dù sự kiện này đạt đỉnh thảo luận vào ngày 10/3 với hơn 41,000 lượt, nhưng đến sáng 13/3, số lượt thảo luận đã giảm xuống còn 1,619, cho thấy sự quan tâm đang dần hạ nhiệt
+    <a href="https://www.youtube.com/watch?v=eK_3xnsfQyY" target="_blank">[Nguồn]</a>.
+    Tuy nhiên, câu hỏi về quỹ bình ổn xăng dầu và khả năng giá xăng tiếp tục tăng vẫn đang được cộng đồng mạng quan tâm
+    <a href="https://www.youtube.com/watch?v=eK_3xnsfQyY" target="_blank">[Nguồn]</a>.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 3 – CHANNEL BREAKDOWN
+════════════════════════════════════════════ -->
+<section class="slide" id="slide3">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 3 / 5</div>
+    <div class="slide-title">Phân tích theo kênh thảo luận</div>
+    <div class="slide-subtitle">Ngày 12/03/2026 09:00 → 13/03/2026 09:00 &nbsp;|&nbsp; So sánh với 11/03/2026 09:00 → 12/03/2026 09:00</div>
+  </div>
+
+  <div class="top-channel-badge">🏆 Kênh dẫn đầu: TikTok &nbsp;—&nbsp; 12,767 thảo luận</div>
+
+  <div class="chart-wrap" style="height:380px;">
+    <canvas id="channelChart"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 Insight</div>
+    TikTok vẫn là kênh chiếm phần lớn thảo luận về ngành xăng dầu, dù đã ghi nhận mức giảm mạnh 55.99% về số lượng buzz so với ngày hôm qua, cho thấy sự thay đổi trong tâm lý người dùng
+    <a href="https://www.tiktok.com/@vtvcab.kinhdoanh/video/7616265352258850069" target="_blank">[Nguồn]</a>.
+    Bên cạnh đó, nhiều người dùng đang chia sẻ về các chương trình ưu đãi liên quan đến bảo hiểm xe, có thể do lo ngại biến động giá nhiên liệu
+    <a href="https://www.tiktok.com/@bvntsaigon/video/7616236095029710101" target="_blank">[Nguồn]</a>.
+    Đáng chú ý, thông tin về việc giảm giá xăng dầu mạnh mẽ vào ngày 11/03/2026 đã lan tỏa nhanh chóng trên nền tảng này, tạo ra một luồng thảo luận tích cực
+    <a href="https://www.tiktok.com/@vietnamhistory98/video/7616228671438834965" target="_blank">[Nguồn]</a>.
+    Trước đó, nhiều doanh nghiệp đã bắt đầu áp dụng phụ phí xăng dầu do giá tăng cao, điều này cũng thu hút sự quan tâm của cộng đồng mạng
+    <a href="https://www.tiktok.com/@cafebiz.official/video/7616281547523689749" target="_blank">[Nguồn]</a>.
+    Đồng thời, các giải pháp thay thế như xe điện đang được VinFast quảng bá mạnh mẽ, tận dụng biến động giá xăng dầu để thúc đẩy doanh số
+    <a href="https://www.tiktok.com/@xemaydienvinfastcantho/video/7616237889180962055" target="_blank">[Nguồn]</a>.
+    Chính phủ cũng đã có những động thái can thiệp bằng cách sử dụng Quỹ Bình ổn giá để giảm bớt gánh nặng cho người tiêu dùng
+    <a href="https://www.tiktok.com/@vtv24news/video/7616205334666857749" target="_blank">[Nguồn]</a>.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 4 – SENTIMENT
+════════════════════════════════════════════ -->
+<section class="slide" id="slide4">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 4 / 5</div>
+    <div class="slide-title">Sentiment &amp; Channel Breakdown</div>
+    <div class="slide-subtitle">Khung giờ: 12/03/2026 09:00 → 13/03/2026 09:00</div>
+  </div>
+
+  <div class="two-col">
+    <!-- LEFT: Donut Pie -->
+    <div class="col-50">
+      <div class="chart-title">Phân bố sắc thái thảo luận</div>
+      <div class="chart-subtitle">Tổng 15,513 thảo luận</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="sentPieChart"></canvas>
+      </div>
+    </div>
+    <!-- RIGHT: Stacked Bar -->
+    <div class="col-50">
+      <div class="chart-title">Sắc thái thảo luận theo kênh có lượng thảo luận cao nhất</div>
+      <div class="chart-subtitle">Top kênh theo tổng thảo luận (100% stacked)</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="sentStackedChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 Insight</div>
+    Phân tích sentiment cho thấy sự phân bố không đồng đều, với phần lớn các thảo luận mang tính trung lập (14,427), trong khi sentiment tiêu cực chiếm 856 và tích cực chỉ 230, cho thấy sự thận trọng hoặc thiếu quan tâm của cộng đồng đối với ngành xăng dầu
+    <a href="https://vov.vn/thi-truong/gia-xang-dau-tiep-tuc-duoc-dieu-chinh-tu-22h-toi-123-post1275261.vov" target="_blank">[Nguồn]</a>.
+    Trên TikTok, sentiment tiêu cực chiếm tỷ lệ đáng kể (208/12,484), cho thấy người dùng trên nền tảng này đặc biệt quan tâm đến các biến động giá và tác động của chúng, trong khi Facebook và YouTube có tỷ lệ tiêu cực thấp hơn nhiều
+    <a href="https://www.tiktok.com/@theanh28entertainment/video/7616125859186937106?cid=NzYxNjE4MzU3Mzg0NzYyMjQyMQ" target="_blank">[Nguồn]</a>.
+    Các bài đăng tiêu cực tập trung chủ yếu vào việc điều chỉnh giá xăng dầu, với thông tin về việc tăng giá được lan truyền trên các kênh tin tức như VOV, gây lo ngại cho người tiêu dùng
+    <a href="https://vov.vn/thi-truong/gia-xang-dau-tiep-tuc-duoc-dieu-chinh-tu-22h-toi-123-post1275261.vov" target="_blank">[Nguồn]</a>.
+    Bên cạnh đó, một số ý kiến tiêu cực trên YouTube thể hiện sự so sánh và chỉ trích chính sách hỗ trợ giá xăng dầu của Việt Nam so với Thái Lan
+    <a href="https://www.youtube.com/watch?v=ZgZg46cP6OE" target="_blank">[Nguồn]</a>.
+    Một số shipper trên Facebook bày tỏ sự bất lực và buộc phải tăng giá dịch vụ do ảnh hưởng trực tiếp từ việc tăng giá xăng dầu
+    <a href="http://facebook.com/100086943746557_906084192299697" target="_blank">[Nguồn]</a>.
+    Tuy nhiên, cũng có những thông tin tích cực về việc giá xăng dầu giảm mạnh, được lan truyền trên các kênh tin tức như Baomoi, mang lại niềm vui cho người tiêu dùng
+    <a href="https://baomoi.com/gia-xang-dau-hom-nay-12-3-giam-cuc-manh-gan-8-000-dong-lit-c54673784.epi" target="_blank">[Nguồn]</a>.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SLIDE 5 – TOP 5 POSTS
+════════════════════════════════════════════ -->
+<section class="slide" id="slide5">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 5 / 5</div>
+    <div class="slide-title">Top 5 bài đăng có lượng bình luận nhiều nhất</div>
+    <div class="slide-subtitle">Ngày 12/03/2026 09:00 → 13/03/2026 09:00</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">STT</th>
+          <th class="left" style="width:45%;">Nội dung bài đăng</th>
+          <th style="width:100px;">Ngày đăng</th>
+          <th style="width:90px;">Kênh</th>
+          <th style="width:150px;">Người đăng</th>
+          <th style="width:110px;">Số bình luận</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);">1</td>
+          <td>TIN VUI: GIÁ XĂNG DẦU GIẢM KHÔNG PHANH, NHIỀU NGƯỜI ĐU ĐỈNH LỖ GẦN 4000đ / LÍT #taichinhkinhte #news...
+            <br><a href="https://www.tiktok.com/@kienthuckinhte28/video/7616188017052536084" target="_blank">🔗 Link</a>
+          </td>
+          <td class="center">12/03/2026</td>
+          <td class="center"><span class="channel-tag tag-tiktok">TikTok</span></td>
+          <td class="center" style="font-size:12px;">kienthuckinhte28</td>
+          <td class="center" style="font-weight:700;font-size:15px;">811</td>
+        </tr>
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);">2</td>
+          <td>Từ 22h hôm nay (12/3), giá xăng RON 95, dầu diesel cùng tăng #theanh28 #theanh28news #tiktoknews
+            <br><a href="https://www.tiktok.com/@theanh28entertainment/video/7616394097636412680" target="_blank">🔗 Link</a>
+          </td>
+          <td class="center">12/03/2026</td>
+          <td class="center"><span class="channel-tag tag-tiktok">TikTok</span></td>
+          <td class="center" style="font-size:12px;">theanh28entertainment</td>
+          <td class="center" style="font-weight:700;font-size:15px;">523</td>
+        </tr>
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);">3</td>
+          <td>GIÁ XĂNG HÔM NAY GIẢM MẠNH, TÀI XẾ TỰ TIN HÔ "CHO TÔI ĐẦY BÌNH" #theanh28 #tiktoknews #hanoinews
+            <br><a href="https://www.tiktok.com/@hanoinews.theanh28/video/7616202807900704020" target="_blank">🔗 Link</a>
+          </td>
+          <td class="center">12/03/2026</td>
+          <td class="center"><span class="channel-tag tag-tiktok">TikTok</span></td>
+          <td class="center" style="font-size:12px;">hanoinews.theanh28</td>
+          <td class="center" style="font-weight:700;font-size:15px;">445</td>
+        </tr>
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);">4</td>
+          <td>HÀ NỘI: CÂY CĂNG "KHÁC LẠ" SAU KHI GIÁ XĂNG DẦU GIẢM MẠNH #theanh28 #60giay #tiktoknews
+            <br><a href="https://www.tiktok.com/@60giay.com/video/7616269230245383442" target="_blank">🔗 Link</a>
+          </td>
+          <td class="center">12/03/2026</td>
+          <td class="center"><span class="channel-tag tag-tiktok">TikTok</span></td>
+          <td class="center" style="font-size:12px;">60giay.com</td>
+          <td class="center" style="font-weight:700;font-size:15px;">297</td>
+        </tr>
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);">5</td>
+          <td>Lí do giá xăng giảm mạnh ngày 12/3 #giaxangdau #giaxanggiam #giaxangdauvietnam
+            <br><a href="https://www.tiktok.com/@chienhalo/video/7616222155335912711" target="_blank">🔗 Link</a>
+          </td>
+          <td class="center">12/03/2026</td>
+          <td class="center"><span class="channel-tag tag-tiktok">TikTok</span></td>
+          <td class="center" style="font-size:12px;">chienhalo</td>
+          <td class="center" style="font-weight:700;font-size:15px;">267</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>Brand Health Analysis &nbsp;·&nbsp; Ngành Xăng Dầu &nbsp;·&nbsp; 12/03/2026 – 13/03/2026 &nbsp;·&nbsp; Powered by Kompa AI</footer>
+
+<!-- ════════════════════════════════════════════
+     CHART SCRIPTS
+════════════════════════════════════════════ -->
+<script>
+/* ─── helpers ─── */
+Chart.defaults.font.family = "'Inter', sans-serif";
+
+/* ─── SLIDE 2: Trendline ─── */
+(function(){
+  const labels = ['05/03','06/03','07/03','08/03','09/03','10/03','11/03','12/03','13/03'];
+  const data   = [15389, 6934, 32982, 25368, 38161, 41082, 32399, 22295, 1619];
+  const peakIdx = 5; // index of 10/03
+
+  const pointBg = data.map((_, i) => i === peakIdx ? '#dc2626' : '#1e40af');
+  const pointR  = data.map((_, i) => i === peakIdx ? 8 : 5);
+
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Thảo luận',
+        data,
+        borderColor: '#1e40af',
+        borderWidth: 3,
+        backgroundColor: 'rgba(30,64,175,.08)',
+        fill: true,
+        tension: 0.35,
+        pointBackgroundColor: pointBg,
+        pointRadius: pointR,
+        pointHoverRadius: 9,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.parsed.y.toLocaleString() + ' thảo luận'
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#e5e7eb', dash: [4,4] } },
+        y: {
+          grid: { color: '#e5e7eb', dash: [4,4] },
+          ticks: { callback: v => v.toLocaleString() }
+        }
+      }
+    }
+  });
+})();
+
+/* ─── SLIDE 3: Channel Horizontal Bar ─── */
+(function(){
+  const channels = ['TikTok','Facebook','News','YouTube','Forum','Social','Threads'];
+  const values   = [12767,   1128,     999,   502,     102,    21,      3];
+  const changes  = [-55.99, -53.68, +10.88, -29.20,  -8.11, +5.00, -81.25];
+  const colors   = ['#000000','#1877f2','#f59e0b','#ff0000','#6b7280','#a855f7','#e0a000'];
+
+  new Chart(document.getElementById('channelChart'), {
+    type: 'bar',
+    data: {
+      labels: channels,
+      datasets: [{
+        label: 'Thảo luận',
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 6,
+        barThickness: 32,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const i = ctx.dataIndex;
+              const sign = changes[i] >= 0 ? '+' : '';
+              return ` ${ctx.parsed.x.toLocaleString()} (${sign}${changes[i]}%)`;
+            }
+          }
+        },
+        datalabels: { display: false }
+      },
+      scales: {
+        x: {
+          grid: { color: '#e5e7eb' },
+          ticks: { callback: v => v.toLocaleString() }
+        },
+        y: { grid: { display: false } }
+      }
+    },
+    plugins: [{
+      id: 'barLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, data } = chart;
+        ctx.save();
+        chart.getDatasetMeta(0).data.forEach((bar, i) => {
+          const val = values[i];
+          const chg = changes[i];
+          const sign = chg >= 0 ? '+' : '';
+          const color = chg >= 0 ? '#16a34a' : '#dc2626';
+          const x = bar.x + 8;
+          const y = bar.y;
+          ctx.textBaseline = 'middle';
+          ctx.font = 'bold 12px Inter';
+          ctx.fillStyle = '#1f2937';
+          ctx.fillText(val.toLocaleString(), x, y - 6);
+          ctx.font = '11px Inter';
+          ctx.fillStyle = color;
+          ctx.fillText(`${sign}${chg}%`, x, y + 8);
+        });
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* ─── SLIDE 4 LEFT: Donut ─── */
+(function(){
+  new Chart(document.getElementById('sentPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Trung lập', 'Tiêu cực', 'Tích cực'],
+      datasets: [{
+        data: [14427, 856, 230],
+        backgroundColor: ['#6b7280','#dc2626','#16a34a'],
+        borderWidth: 2, borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct = ((ctx.parsed / total) * 100).toFixed(1);
+              return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${pct}%)`;
+            }
+          }
+        }
+      }
+    },
+    plugins: [{
+      id: 'centerText',
+      beforeDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const cx = (left + right) / 2, cy = (top + bottom) / 2;
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = 'bold 22px Inter'; ctx.fillStyle = '#0f172a';
+        ctx.fillText('15,513', cx, cy - 10);
+        ctx.font = '11px Inter'; ctx.fillStyle = '#6b7280';
+        ctx.fillText('Thảo luận', cx, cy + 12);
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* ─── SLIDE 4 RIGHT: 100% Stacked Bar (vertical) ─── */
+(function(){
+  // channels sorted by total desc
+  // TikTok:12758, News:999, YouTube:502, FB Pages:437, FB Users:414, FB Groups:277, Forum:102, Social:21
+  const channels = ['TikTok','News','YouTube','FB Pages','FB Users','FB Groups','Forum','Social'];
+  const neg  = [208,  351, 27,  91,  91,  55, 26,  7];
+  const neu  = [12484, 556, 467, 324, 303, 200, 76, 14];
+  const pos  = [66,   92,   8,  22,  20,  22,  0,  0];
+
+  // convert to percentages
+  function toPct(arr) {
+    return arr.map((v, i) => {
+      const total = neg[i] + neu[i] + pos[i];
+      return total === 0 ? 0 : +((v / total) * 100).toFixed(1);
+    });
+  }
+
+  new Chart(document.getElementById('sentStackedChart'), {
+    type: 'bar',
+    data: {
+      labels: channels,
+      datasets: [
+        { label: 'Tiêu cực', data: toPct(neg), backgroundColor: '#dc2626', stack: 's1', borderWidth: 0 },
+        { label: 'Trung lập', data: toPct(neu), backgroundColor: '#6b7280', stack: 's1', borderWidth: 0 },
+        { label: 'Tích cực',  data: toPct(pos), backgroundColor: '#16a34a', stack: 's1', borderWidth: 0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { padding: 12, font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: {
+          stacked: true, min: 0, max: 100,
+          ticks: { callback: v => v + '%' },
+          grid: { color: '#e5e7eb' }
+        }
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

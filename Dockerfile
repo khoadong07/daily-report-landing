@@ -1,0 +1,18 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY app.py .
+COPY templates templates/
+
+# Create reports directory
+RUN mkdir -p reports
+
+EXPOSE 8000
+
+CMD ["python", "app.py"]
