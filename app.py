@@ -49,6 +49,18 @@ def markdown_links_filter(text):
     result = re.sub(pattern, replace_link, text)
     return result
 
+def generate_static_url(path):
+    """Generate proper static URL with correct prefix for both development and production"""
+    # Clean the path - remove leading slashes
+    clean_path = path.lstrip('/')
+    
+    if ENVIRONMENT == 'production':
+        # In production, always use the /daily prefix
+        return f"/daily/static/{clean_path}"
+    else:
+        # In development, use simple static path
+        return f"/static/{clean_path}"
+
 REPORTS_DIR = 'reports'
 LOGOS_DIR = 'static/logos'
 os.makedirs(REPORTS_DIR, exist_ok=True)
@@ -148,18 +160,36 @@ def test_logo_upload():
 @app.route('/static/logos/<filename>')
 @app.route('/daily/static/logos/<filename>')
 def serve_logo(filename):
-    """Serve logo files"""
+    """Serve logo files with proper headers and MIME types"""
     print(f"Serving logo: {filename}")
     try:
         logo_path = os.path.join(LOGOS_DIR, filename)
         print(f"Logo path: {logo_path}")
         print(f"Logo exists: {os.path.exists(logo_path)}")
-        print(f"Current working directory: {os.getcwd()}")
-        print(f"LOGOS_DIR: {LOGOS_DIR}")
         
         if os.path.exists(logo_path):
             from flask import send_file
-            return send_file(logo_path)
+            
+            # Determine proper MIME type
+            if filename.lower().endswith('.png'):
+                mimetype = 'image/png'
+            elif filename.lower().endswith(('.jpg', '.jpeg')):
+                mimetype = 'image/jpeg'
+            elif filename.lower().endswith('.svg'):
+                mimetype = 'image/svg+xml'
+            elif filename.lower().endswith('.gif'):
+                mimetype = 'image/gif'
+            elif filename.lower().endswith('.webp'):
+                mimetype = 'image/webp'
+            else:
+                mimetype = 'application/octet-stream'
+            
+            return send_file(
+                logo_path,
+                mimetype=mimetype,
+                as_attachment=False,
+                cache_timeout=31536000  # 1 year cache
+            )
         else:
             print(f"Logo file not found: {logo_path}")
             return "Logo not found", 404
@@ -170,23 +200,85 @@ def serve_logo(filename):
 @app.route('/static/<filename>')
 @app.route('/daily/static/<filename>')
 def serve_static(filename):
-    """Serve static files"""
+    """Serve static files with proper headers and MIME types"""
     print(f"Serving static file: {filename}")
     try:
         static_path = os.path.join('static', filename)
         print(f"Static path: {static_path}")
         print(f"Static exists: {os.path.exists(static_path)}")
-        print(f"Current working directory: {os.getcwd()}")
         
         if os.path.exists(static_path):
             from flask import send_file
-            return send_file(static_path)
+            
+            # Determine proper MIME type
+            ext = filename.lower().split('.')[-1]
+            mime_types = {
+                'png': 'image/png',
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'gif': 'image/gif',
+                'svg': 'image/svg+xml',
+                'webp': 'image/webp',
+                'css': 'text/css',
+                'js': 'application/javascript',
+                'json': 'application/json',
+                'txt': 'text/plain',
+                'html': 'text/html'
+            }
+            mimetype = mime_types.get(ext, 'application/octet-stream')
+            
+            return send_file(
+                static_path,
+                mimetype=mimetype,
+                as_attachment=False,
+                cache_timeout=31536000  # 1 year cache
+            )
         else:
             print(f"Static file not found: {static_path}")
             return "File not found", 404
     except Exception as e:
         print(f"Error serving static file {filename}: {str(e)}")
         return "Error serving static file", 500
+
+@app.route('/debug/static')
+@app.route('/daily/debug/static')
+def debug_static():
+    """Debug route to check static files and URL generation"""
+    try:
+        import os
+        debug_info = {
+            'current_directory': os.getcwd(),
+            'static_exists': os.path.exists('static'),
+            'logos_exists': os.path.exists('static/logos'),
+            'static_url_prefix': STATIC_URL_PREFIX,
+            'app_base_url': APP_BASE_URL,
+            'environment': ENVIRONMENT,
+            'application_root': app.config.get('APPLICATION_ROOT', 'Not set'),
+            'sample_logo_url': generate_static_url('logos/sample.png'),
+            'sample_static_url': generate_static_url('image.jpeg'),
+            'test_urls': {
+                'logo_dev': '/static/logos/sample.png',
+                'logo_prod': '/daily/static/logos/sample.png',
+                'static_dev': '/static/image.jpeg',
+                'static_prod': '/daily/static/image.jpeg'
+            }
+        }
+        
+        if os.path.exists('static'):
+            debug_info['static_files'] = os.listdir('static')
+        
+        if os.path.exists('static/logos'):
+            debug_info['logo_files'] = os.listdir('static/logos')
+            # Test with actual logo file if exists
+            if debug_info['logo_files']:
+                actual_logo = debug_info['logo_files'][0]
+                debug_info['actual_logo_url'] = generate_static_url(f'logos/{actual_logo}')
+                debug_info['test_urls']['actual_logo_dev'] = f'/static/logos/{actual_logo}'
+                debug_info['test_urls']['actual_logo_prod'] = f'/daily/static/logos/{actual_logo}'
+            
+        return jsonify(debug_info)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/extract-topics', methods=['POST'])
 def extract_topics():
@@ -612,6 +704,7 @@ def test_form():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/templates')
+@app.route('/daily/api/templates')
 def list_templates():
     """List available templates for debugging"""
     try:
@@ -641,6 +734,7 @@ def list_templates():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/reports/<filename>', methods=['DELETE'])
+@app.route('/daily/api/reports/<filename>', methods=['DELETE'])
 def delete_report(filename):
     """Delete a specific report file"""
     try:
@@ -668,6 +762,7 @@ def delete_report(filename):
         return jsonify({'error': f'Failed to delete report: {str(e)}'}), 500
 
 @app.route('/api/reports')
+@app.route('/daily/api/reports')
 def list_reports():
     files = os.listdir(REPORTS_DIR)
     reports = []
