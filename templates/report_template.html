@@ -837,7 +837,12 @@
   </div>
 
   <div class="kpi-row">
-    {% for item in slide_1.data %}
+    {% set buzz_item = slide_1.data | selectattr('type', 'equalto', 'buzz') | first %}
+    {% set post_item = slide_1.data | selectattr('type', 'equalto', 'post') | first %}
+    {% set comments_item = slide_1.data | selectattr('type', 'equalto', 'comments') | first %}
+    {% set ordered_items = [buzz_item, post_item, comments_item] %}
+    {% for item in ordered_items %}
+    {% if item %}
     <div class="kpi-card">
       <div class="kpi-change {% if item.change_pct < 0 %}down{% else %}up{% endif %}">
         {% if item.change_pct < 0 %}▼{% else %}▲{% endif %} {{ "%.2f"|format(item.change_pct|abs) }}%
@@ -845,6 +850,7 @@
       <div class="kpi-label">{{ item.label }}</div>
       <div class="kpi-value {% if item.type == 'buzz' %}large{% else %}small{% endif %}">{{ "{:,}".format(item.today) }}</div>
     </div>
+    {% endif %}
     {% endfor %}
   </div>
 
