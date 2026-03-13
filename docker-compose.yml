@@ -7,4 +7,7 @@ services:
       - "8000:8000"
     volumes:
       - ./reports:/app/reports
+      - ./static:/app/static
+    environment:
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped

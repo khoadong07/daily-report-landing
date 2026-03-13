@@ -149,12 +149,19 @@ def test_logo_upload():
 @app.route('/daily/static/logos/<filename>')
 def serve_logo(filename):
     """Serve logo files"""
+    print(f"Serving logo: {filename}")
     try:
         logo_path = os.path.join(LOGOS_DIR, filename)
+        print(f"Logo path: {logo_path}")
+        print(f"Logo exists: {os.path.exists(logo_path)}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"LOGOS_DIR: {LOGOS_DIR}")
+        
         if os.path.exists(logo_path):
             from flask import send_file
             return send_file(logo_path)
         else:
+            print(f"Logo file not found: {logo_path}")
             return "Logo not found", 404
     except Exception as e:
         print(f"Error serving logo {filename}: {str(e)}")
@@ -164,12 +171,18 @@ def serve_logo(filename):
 @app.route('/daily/static/<filename>')
 def serve_static(filename):
     """Serve static files"""
+    print(f"Serving static file: {filename}")
     try:
         static_path = os.path.join('static', filename)
+        print(f"Static path: {static_path}")
+        print(f"Static exists: {os.path.exists(static_path)}")
+        print(f"Current working directory: {os.getcwd()}")
+        
         if os.path.exists(static_path):
             from flask import send_file
             return send_file(static_path)
         else:
+            print(f"Static file not found: {static_path}")
             return "File not found", 404
     except Exception as e:
         print(f"Error serving static file {filename}: {str(e)}")

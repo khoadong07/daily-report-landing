@@ -11,8 +11,10 @@ COPY app.py .
 COPY templates templates/
 COPY static static/
 
-# Create reports directory
-RUN mkdir -p reports
+# Create directories with proper permissions
+RUN mkdir -p reports static/logos && \
+    chmod -R 755 static && \
+    chmod -R 755 reports
 
 EXPOSE 8000
 
