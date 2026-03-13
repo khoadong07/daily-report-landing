@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ report_metadata.report_name if report_metadata.report_name else 'Brand Health Analysis' }}</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #080d1a;
+    --bg-card: #0f1829;
+    --bg-card-hover: #151f35;
+    --surface: #1a2540;
+    --surface-2: #1e2d4a;
+    --primary: #00e5ff;
+    --primary-dim: rgba(0, 229, 255, 0.15);
+    --secondary: #7c3aed;
+    --secondary-dim: rgba(124, 58, 237, 0.15);
+    --accent: #f59e0b;
+    --accent-dim: rgba(245, 158, 11, 0.15);
+    --success: #10b981;
+    --success-dim: rgba(16, 185, 129, 0.15);
+    --error: #f43f5e;
+    --error-dim: rgba(244, 63, 94, 0.15);
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --border: rgba(255, 255, 255, 0.06);
+    --border-glow: rgba(0, 229, 255, 0.25);
+    --shadow-neon: 0 0 20px rgba(0, 229, 255, 0.12), 0 0 60px rgba(0, 229, 255, 0.04);
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --radius-sm: 0.375rem;
+    --radius: 0.625rem;
+    --radius-md: 0.875rem;
+    --radius-lg: 1.25rem;
+    --radius-xl: 1.75rem;
+    --radius-2xl: 2.25rem;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 229, 255, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 80% at 80% 60%, rgba(124, 58, 237, 0.04) 0%, transparent 60%);
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(8, 13, 26, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    display: flex; align-items: center; gap: 0.375rem;
+    padding: 0.875rem 2rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .nav::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.4;
+  }
+  .nav-brand {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-right: auto;
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .nav-brand-logo {
+    height: 2.25rem; width: auto; max-width: 10rem;
+    object-fit: contain;
+    background: rgba(255,255,255,0.05);
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.4rem 0.875rem;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    letter-spacing: 0.01em;
+  }
+  .nav a:hover, .nav a.active {
+    color: var(--primary);
+    background: var(--primary-dim);
+    border-color: rgba(0, 229, 255, 0.2);
+    text-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+  }
+
+  /* ── SLIDE WRAPPER ── */
+  .slide {
+    max-width: 1400px; margin: 2rem auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-card);
+    padding: 3rem;
+    scroll-margin-top: 5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .slide::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+    opacity: 0.6;
+  }
+  .slide:hover { border-color: rgba(0, 229, 255, 0.15); }
+
+  /* ── SLIDE HEADER ── */
+  .slide-header { margin-bottom: 2.5rem; position: relative; z-index: 1; }
+  .slide-number {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--primary-dim);
+    color: var(--primary);
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 0.3rem 0.875rem;
+    border-radius: 2rem;
+    margin-bottom: 0.875rem;
+    text-transform: uppercase;
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .slide-number::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .slide-title {
+    font-size: 1.875rem; font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+  }
+  .slide-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  /* ── KPI CARDS ── */
+  .kpi-row {
+    display: flex; gap: 1.25rem;
+    justify-content: center;
+    margin-bottom: 2rem; flex-wrap: wrap;
+  }
+  .kpi-card {
+    flex: 1; max-width: 20rem; min-width: 15rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .kpi-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--primary-dim) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .kpi-card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-neon), var(--shadow-card);
+  }
+  .kpi-card:hover::after { opacity: 1; }
+  .kpi-label {
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+  .kpi-value {
+    font-size: 2.75rem; font-weight: 700;
+    line-height: 1;
+    color: var(--primary);
+    font-family: 'JetBrains Mono', monospace;
+    text-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+  }
+  .kpi-value.large { font-size: 3.5rem; }
+  .kpi-value.small { font-size: 2rem; }
+  .kpi-change {
+    margin-top: 0.875rem; font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 0.25rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .kpi-change.down {
+    color: var(--error);
+    background: var(--error-dim);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    display: inline-flex;
+  }
+  .kpi-change.up {
+    color: var(--success);
+    background: var(--success-dim);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    display: inline-flex;
+  }
+
+  /* ── INSIGHT BOX ── */
+  .insight-box {
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    font-size: 0.875rem; line-height: 1.7;
+    color: var(--text-dim);
+    position: relative;
+  }
+  .insight-box::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--primary), var(--secondary));
+    border-radius: 3px 0 0 3px;
+  }
+  .insight-box a {
+    color: var(--primary); font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+    transition: border-color 0.2s, text-shadow 0.2s;
+  }
+  .insight-box a:hover {
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    border-bottom-color: var(--primary);
+  }
+  .insight-label {
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .insight-label::before {
+    content: '//';
+    opacity: 0.5;
+  }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-wrap {
+    position: relative; width: 100%; margin-bottom: 2rem;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+  }
+  .chart-highlight {
+    display: flex; gap: 1.25rem; margin-bottom: 2rem; flex-wrap: wrap;
+  }
+  .highlight-card {
+    flex: 1; min-width: 14rem;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    font-size: 0.875rem; font-weight: 700;
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+    border: 1px solid;
+  }
+  .highlight-card:hover { transform: translateY(-2px); }
+  .highlight-card.peak {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.1) 0%, rgba(244, 63, 94, 0.05) 100%);
+    border-color: rgba(244, 63, 94, 0.3);
+    color: var(--error);
+  }
+  .highlight-card.cool {
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(0, 229, 255, 0.05) 100%);
+    border-color: rgba(0, 229, 255, 0.3);
+    color: var(--primary);
+  }
+  .highlight-card .hc-title {
+    font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.1em; opacity: 0.7; margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .highlight-card .hc-value {
+    font-size: 1.875rem; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    text-shadow: 0 0 12px currentColor;
+  }
+
+  /* ── TWO COLUMN ── */
+  .two-col { display: flex; gap: 2rem; margin-bottom: 2rem; align-items: flex-start; flex-wrap: wrap; }
+  .col-50 { flex: 1; min-width: 18rem; }
+
+  /* ── TOP CHANNEL BADGE ── */
+  .top-channel-badge {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.06) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1.5rem;
+    font-weight: 700; font-size: 0.875rem;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+  .top-channel-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; background: var(--bg-card); }
+  table thead tr th {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-weight: 700; font-size: 0.7rem;
+    padding: 1.125rem 1rem;
+    text-align: center; border: none;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-family: 'JetBrains Mono', monospace;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+  }
+  table thead tr th.left { text-align: left; }
+  table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.015); }
+  table tbody tr:hover td { background: rgba(0, 229, 255, 0.04); }
+  table tbody tr td {
+    padding: 1rem; border: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text-dim);
+    transition: background-color 0.2s ease;
+  }
+  table tbody tr td.center { text-align: center; }
+  table tbody tr td a {
+    color: var(--primary); font-weight: 600;
+    text-decoration: none;
+    transition: text-shadow 0.2s;
+  }
+  table tbody tr td a:hover { text-shadow: 0 0 8px rgba(0, 229, 255, 0.5); }
+  .channel-tag {
+    display: inline-block; padding: 0.2rem 0.625rem;
+    border-radius: 2rem;
+    font-size: 0.7rem; font-weight: 700;
+    color: #fff; text-transform: uppercase; letter-spacing: 0.05em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .tag-tiktok { background: #1a1a1a; border: 1px solid #444; }
+  .tag-facebook { background: #1877f2; }
+  .tag-youtube { background: #ff0000; }
+  .tag-news { background: rgba(245, 158, 11, 0.2); color: var(--accent); border: 1px solid rgba(245, 158, 11, 0.4); }
+  .tag-forum { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.4); }
+
+  /* ── SECTION TITLES ── */
+  .chart-title {
+    font-size: 1rem; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.375rem;
+    letter-spacing: -0.01em;
+  }
+  .chart-subtitle {
+    font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.25rem;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* ── COVER SLIDE ── */
+  .cover-slide {
+    max-width: 1400px; margin: 2rem auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-card);
+    padding: 5rem 3rem;
+    scroll-margin-top: 5rem;
+    text-align: center; color: var(--text);
+    min-height: 42rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .cover-slide::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 80% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 40% at 10% 60%, rgba(245, 158, 11, 0.04) 0%, transparent 60%);
+  }
+  .cover-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .cover-content {
+    display: flex; flex-direction: column; align-items: center; gap: 1.75rem;
+    position: relative; z-index: 1;
+  }
+  .cover-logo {
+    height: 3.5rem; width: auto; max-width: 14rem;
+    object-fit: contain;
+    background: rgba(255,255,255,0.05);
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
+  .cover-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--primary-dim);
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    padding: 0.375rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--primary); letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cover-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+  }
+  .cover-title {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    text-shadow: 0 0 40px rgba(0, 229, 255, 0.15);
+  }
+  .cover-title span {
+    color: var(--primary);
+    text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  }
+  .cover-date {
+    font-size: 1.125rem; font-weight: 500;
+    background: var(--surface);
+    padding: 0.875rem 2rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    display: inline-block;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .cover-author {
+    font-size: 0.9375rem; font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-dim);
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── CONTACT SLIDE ── */
+  .contact-slide {
+    max-width: 1400px; margin: 2rem auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-card);
+    padding: 5rem 3rem;
+    scroll-margin-top: 5rem;
+    color: var(--text);
+    min-height: 35rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .contact-slide::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 50% 60% at 0% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 100% 20%, rgba(0, 229, 255, 0.06) 0%, transparent 60%);
+  }
+  .contact-slide .cover-grid { opacity: 0.5; }
+  .contact-content { position: relative; z-index: 1; }
+  .contact-title {
+    font-size: clamp(2.5rem, 7vw, 3.75rem);
+    font-weight: 700;
+    margin-bottom: 3rem;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text);
+  }
+  .contact-title span { color: var(--primary); text-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
+  .contact-features { list-style: none; margin-bottom: 3.5rem; }
+  .contact-features li {
+    font-size: 1.25rem; font-weight: 500;
+    margin-bottom: 1.25rem;
+    padding-left: 2.25rem;
+    position: relative; line-height: 1.4;
+    color: var(--text-dim);
+  }
+  .contact-features li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--primary);
+    font-family: 'JetBrains Mono', monospace;
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+  }
+  .contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem; max-width: 55rem;
+  }
+  .contact-item {
+    text-align: center; padding: 1.375rem;
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+  }
+  .contact-item:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-neon);
+  }
+  .contact-label {
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--text-muted); margin-bottom: 0.625rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .contact-value {
+    font-size: 1rem; font-weight: 700;
+    color: var(--primary);
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+  }
+
+  /* ── IMAGE CONTAINER ── */
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+  }
+  .glossary-image {
+    max-width: 100%; height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.3s ease;
+  }
+  .glossary-image:hover { transform: scale(1.02); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: 1.75rem 2rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 768px) {
+    .slide, .cover-slide, .contact-slide { padding: 2rem; margin: 1rem; }
+    .cover-title { font-size: 2.25rem; }
+    .two-col { flex-direction: column; }
+    .kpi-row { flex-direction: column; align-items: stretch; }
+    .kpi-card { max-width: none; min-width: auto; }
+    .contact-info { grid-template-columns: 1fr; max-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .slide, .cover-slide, .contact-slide { padding: 1.5rem; margin: 0.5rem; }
+    .kpi-card { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    {% if report_metadata.brand_logo %}
+      <img src="{{ report_metadata.brand_logo }}" alt="{{ report_metadata.brand }}" class="nav-brand-logo">
+    {% else %}
+      <span>{{ report_metadata.brand }}</span>
+    {% endif %}
+  </div>
+  <a href="#cover">Cover</a>
+  <a href="#slide1">Overview</a>
+  <a href="#slide2">Trendline</a>
+  <a href="#slide3">Channel</a>
+  <a href="#slide4">Sentiment</a>
+  <a href="#slide5">Top Posts</a>
+  <a href="#slide6">Terminology</a>
+  <a href="#slide7">Contact</a>
+</nav>
+
+<!-- COVER -->
+<section class="cover-slide" id="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-content">
+    {% if report_metadata.brand_logo %}
+      <img src="{{ report_metadata.brand_logo }}" alt="{{ report_metadata.brand }}" class="cover-logo">
+    {% endif %}
+    <div class="cover-badge">Social Listening Report</div>
+    <div class="cover-title">{{ report_metadata.report_name if report_metadata.report_name else 'Daily Report' }}</div>
+    <div class="cover-date">{{ report_metadata.report_date }}</div>
+    <div class="cover-author">Được tạo bởi Kompa.ai</div>
+  </div>
+</section>
+
+<!-- SLIDE 1 – BRAND OVERVIEW -->
+<section class="slide" id="slide1">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 1 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_1.title }}</div>
+    <div class="slide-subtitle">{{ slide_1.subtitle }}</div>
+  </div>
+
+  <div class="kpi-row">
+    {% set buzz_item = slide_1.data | selectattr('type', 'equalto', 'buzz') | first %}
+    {% set post_item = slide_1.data | selectattr('type', 'equalto', 'post') | first %}
+    {% set comments_item = slide_1.data | selectattr('type', 'equalto', 'comments') | first %}
+    {% set ordered_items = [buzz_item, post_item, comments_item] %}
+    {% for item in ordered_items %}{% if item %}
+    <div class="kpi-card">
+      <div class="kpi-change {% if item.change_pct < 0 %}down{% else %}up{% endif %}">
+        {% if item.change_pct < 0 %}▼{% else %}▲{% endif %} {{ "%.2f"|format(item.change_pct|abs) }}%
+      </div>
+      <div class="kpi-label">{{ item.label }}</div>
+      <div class="kpi-value {% if item.type == 'buzz' %}large{% else %}small{% endif %}">{{ "{:,}".format(item.today) }}</div>
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_1.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 2 – TRENDLINE -->
+<section class="slide" id="slide2">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 2 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_2.title }}</div>
+    <div class="slide-subtitle">{{ slide_2.subtitle }}</div>
+  </div>
+
+  <div class="chart-highlight">
+    <div class="highlight-card peak">
+      <div class="hc-title">🔥 Đỉnh thảo luận</div>
+      <div class="hc-value">{{ "{:,}".format(slide_2.peak_day.buzz) }}</div>
+      <div style="margin-top:4px;font-size:11px;opacity:0.7;font-family:'JetBrains Mono',monospace;">{{ slide_2.peak_day.date }}</div>
+    </div>
+    <div class="highlight-card cool">
+      <div class="hc-title">⚡ Trạng thái hiện tại</div>
+      <div class="hc-value">{{ "{:,}".format(slide_2.current_day.buzz) }}</div>
+      <div style="margin-top:4px;font-size:11px;opacity:0.7;font-family:'JetBrains Mono',monospace;">{{ slide_2.current_day.date }} — {% if slide_2.current_day.is_still_hot %}Vẫn nóng{% else %}Đã hạ nhiệt{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap" style="height:320px;">
+    <canvas id="trendChart"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_2.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 3 – CHANNEL BREAKDOWN -->
+<section class="slide" id="slide3">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 3 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_3.title }}</div>
+    <div class="slide-subtitle">{{ slide_3.subtitle }}</div>
+  </div>
+
+  <div class="top-channel-badge">🏆 Kênh dẫn đầu: {{ slide_3.top_channel }} &nbsp;—&nbsp; {{ "{:,}".format(slide_3.channel_distribution[0].today_buzz) }} thảo luận</div>
+
+  <div class="chart-wrap" style="height:380px;">
+    <canvas id="channelChart"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_3.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 4 – SENTIMENT -->
+<section class="slide" id="slide4">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 4 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_4.title }}</div>
+    <div class="slide-subtitle">{{ slide_4.subtitle }}</div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-50">
+      <div class="chart-title">Phân bố sắc thái thảo luận</div>
+      <div class="chart-subtitle">Tổng {{ "{:,}".format(slide_4.sentiment_distribution|sum(attribute='Count')) }} thảo luận</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="sentPieChart"></canvas>
+      </div>
+    </div>
+    <div class="col-50">
+      <div class="chart-title">Sắc thái thảo luận theo kênh</div>
+      <div class="chart-subtitle">Top kênh theo tổng thảo luận</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="sentStackedChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_4.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 5 – TOP POSTS -->
+<section class="slide" id="slide5">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 5 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_5.title }}</div>
+    <div class="slide-subtitle">{{ slide_5.subtitle }}</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">STT</th>
+          <th class="left" style="width:45%;">Nội dung bài đăng</th>
+          <th style="width:100px;">Ngày đăng</th>
+          <th style="width:90px;">Kênh</th>
+          <th style="width:150px;">Người đăng</th>
+          <th style="width:110px;">Số bình luận</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in slide_5.top_posts %}
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);font-family:'JetBrains Mono',monospace;">{{ post.stt }}</td>
+          <td>{{ post.noi_dung_bai_dang[:100] }}{% if post.noi_dung_bai_dang|length > 100 %}...{% endif %}
+            <br><a href="{{ post.url_topic }}" target="_blank">→ Link</a>
+          </td>
+          <td class="center" style="font-family:'JetBrains Mono',monospace;font-size:12px;">{{ post.ngay_dang[:10] }}</td>
+          <td class="center"><span class="channel-tag tag-{{ post.kenh.lower() }}">{{ post.kenh }}</span></td>
+          <td class="center" style="font-size:12px;">{{ post.nguoi_dang }}</td>
+          <td class="center" style="font-weight:700;font-size:15px;color:var(--primary);font-family:'JetBrains Mono',monospace;">{{ post.comment_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SLIDE 6 – GLOSSARY -->
+<section class="slide" id="slide6">
+  <div class="slide-header">
+    <div class="slide-title">Thuật ngữ sử dụng trong báo cáo</div>
+  </div>
+  <div class="image-container">
+    <img src="{{ static_url_prefix }}/static/image.jpeg" alt="Thuật ngữ báo cáo" class="glossary-image">
+  </div>
+</section>
+
+<!-- SLIDE 7 – CONTACT -->
+<section class="contact-slide" id="slide7">
+  <div class="cover-grid" style="opacity:0.3;"></div>
+  <div class="contact-content">
+    <div class="contact-title">Xin cảm <span>ơn!</span></div>
+    <ul class="contact-features">
+      <li>Tăng trưởng Thương hiệu bền vững cùng Kompa</li>
+      <li>Phát hiện sớm cơ hội — Ứng phó kịp thời rủi ro — Tối ưu hiệu quả truyền thông</li>
+    </ul>
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="contact-label">Website</div>
+        <div class="contact-value">kompa.ai</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Email</div>
+        <div class="contact-value">info@kompa.ai</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Phone</div>
+        <div class="contact-value">0902 915 510<br><span style="font-size:.875rem;opacity:.7">Ms Như Tran</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>{{ report_metadata.report_name if report_metadata.report_name else 'Brand Health Analysis' }} &nbsp;·&nbsp; {{ report_metadata.brand }} &nbsp;·&nbsp; {{ report_metadata.report_date }} &nbsp;·&nbsp; Powered by Kompa AI</footer>
+
+<script>
+Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+Chart.defaults.color = '#64748b';
+
+/* SLIDE 2: Trendline */
+(function(){
+  const trendData = {{ slide_2.trendline|tojson|safe }};
+  const labels = trendData.map(d => d.date.split('-').slice(1).join('/'));
+  const data = trendData.map(d => d.buzz);
+  const peakDate = '{{ slide_2.peak_day.date }}';
+  const peakIdx = trendData.findIndex(d => d.date === peakDate);
+  const pointBg = data.map((_, i) => i === peakIdx ? '#f43f5e' : '#00e5ff');
+  const pointR  = data.map((_, i) => i === peakIdx ? 8 : 5);
+
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Thảo luận',
+        data,
+        borderColor: '#00e5ff',
+        borderWidth: 2.5,
+        backgroundColor: (ctx) => {
+          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(0, 229, 255, 0.15)');
+          gradient.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
+          return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: pointBg,
+        pointRadius: pointR,
+        pointHoverRadius: 9,
+        pointBorderColor: 'transparent',
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f1829',
+          borderColor: 'rgba(0, 229, 255, 0.3)',
+          borderWidth: 1,
+          callbacks: { label: ctx => ' ' + ctx.parsed.y.toLocaleString() + ' thảo luận' }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#64748b', callback: v => v.toLocaleString() }
+        }
+      }
+    }
+  });
+})();
+
+/* SLIDE 3: Channel Bar */
+(function(){
+  const channelData = {{ slide_3.channel_distribution|tojson|safe }};
+  const channels = channelData.map(d => d.Channel);
+  const values = channelData.map(d => d.today_buzz);
+  const changes = channelData.map(d => d.change_pct);
+  const colors = {
+    'Tiktok': '#ffffff', 'Facebook': '#1877f2',
+    'News': '#f59e0b', 'Youtube': '#ff4444',
+    'Forum': '#6b7280', 'Social': '#a855f7', 'Threads': '#e0a000'
+  };
+  const chartColors = channels.map(c => colors[c] || '#00e5ff');
+
+  new Chart(document.getElementById('channelChart'), {
+    type: 'bar',
+    data: {
+      labels: channels,
+      datasets: [{ label: 'Thảo luận', data: values, backgroundColor: chartColors, borderRadius: 6, barThickness: 28 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f1829', borderColor: 'rgba(0, 229, 255, 0.3)', borderWidth: 1,
+          callbacks: { label: ctx => { const i = ctx.dataIndex; const s = changes[i] >= 0 ? '+' : ''; return ` ${ctx.parsed.x.toLocaleString()} (${s}${changes[i]}%)`; } }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', callback: v => v.toLocaleString() } },
+        y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+      }
+    },
+    plugins: [{
+      id: 'barLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+        chart.getDatasetMeta(0).data.forEach((bar, i) => {
+          const s = changes[i] >= 0 ? '+' : '';
+          const color = changes[i] >= 0 ? '#10b981' : '#f43f5e';
+          ctx.textBaseline = 'middle';
+          ctx.font = 'bold 12px Space Grotesk';
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillText(values[i].toLocaleString(), bar.x + 8, bar.y - 6);
+          ctx.font = '11px JetBrains Mono';
+          ctx.fillStyle = color;
+          ctx.fillText(`${s}${changes[i]}%`, bar.x + 8, bar.y + 8);
+        });
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* SLIDE 4: Donut */
+(function(){
+  const sentData = {{ slide_4.sentiment_distribution|tojson|safe }};
+  const labels = sentData.map(d => d.Sentiment === 'Neutral' ? 'Trung lập' : d.Sentiment === 'Negative' ? 'Tiêu cực' : 'Tích cực');
+  const data = sentData.map(d => d.Count);
+  const colors = ['#64748b', '#10b981', '#f43f5e'];
+
+  new Chart(document.getElementById('sentPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#0f1829' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 }, color: '#94a3b8' } },
+        tooltip: {
+          backgroundColor: '#0f1829', borderColor: 'rgba(0, 229, 255, 0.3)', borderWidth: 1,
+          callbacks: { label: ctx => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); const pct = ((ctx.parsed/total)*100).toFixed(1); return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${pct}%)`; } }
+        }
+      }
+    },
+    plugins: [{
+      id: 'centerText',
+      beforeDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const cx = (left + right) / 2, cy = (top + bottom) / 2;
+        const total = data.reduce((a,b)=>a+b,0);
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = 'bold 22px Space Grotesk'; ctx.fillStyle = '#00e5ff';
+        ctx.fillText(total.toLocaleString(), cx, cy - 10);
+        ctx.font = '11px Space Grotesk'; ctx.fillStyle = '#64748b';
+        ctx.fillText('Thảo luận', cx, cy + 12);
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* SLIDE 4: Stacked Bar */
+(function(){
+  const channelSentData = {{ slide_4.channel_sentiment|tojson|safe }};
+  const channels = channelSentData.map(d => d.Channel);
+  const neg = channelSentData.map(d => d.Negative || 0);
+  const neu = channelSentData.map(d => d.Neutral || 0);
+  const pos = channelSentData.map(d => d.Positive || 0);
+  function toPct(arr) {
+    return arr.map((v, i) => { const t = neg[i]+neu[i]+pos[i]; return t===0?0:+((v/t)*100).toFixed(1); });
+  }
+  new Chart(document.getElementById('sentStackedChart'), {
+    type: 'bar',
+    data: {
+      labels: channels,
+      datasets: [
+        { label: 'Tiêu cực', data: toPct(neg), backgroundColor: '#f43f5e', stack: 's1', borderWidth: 0 },
+        { label: 'Trung lập', data: toPct(neu), backgroundColor: '#475569', stack: 's1', borderWidth: 0 },
+        { label: 'Tích cực',  data: toPct(pos), backgroundColor: '#10b981', stack: 's1', borderWidth: 0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { padding: 12, font: { size: 11 }, color: '#94a3b8' } },
+        tooltip: {
+          backgroundColor: '#0f1829', borderColor: 'rgba(0, 229, 255, 0.3)', borderWidth: 1,
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { color: '#64748b' } },
+        y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v+'%', color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

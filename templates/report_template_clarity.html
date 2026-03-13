@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ report_metadata.report_name if report_metadata.report_name else 'Brand Health Analysis' }}</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #059669;
+    --primary-dark: #047857;
+    --primary-light: #34d399;
+    --primary-xlight: #6ee7b7;
+    --secondary: #0ea5e9;
+    --amber: #d97706;
+    --amber-light: #fbbf24;
+    --red: #dc2626;
+    --success: #059669;
+    --error: #dc2626;
+    --warning: #d97706;
+    --bg: #f0fdf4;
+    --bg-2: #ecfdf5;
+    --white: #ffffff;
+    --surface: #f9fffe;
+    --surface-2: #f0fdf9;
+    --gray-50: #f7faf9;
+    --gray-100: #ecf5f2;
+    --gray-200: #d6ebe4;
+    --gray-300: #a7d3c7;
+    --gray-400: #6aafa0;
+    --gray-500: #3d7a6d;
+    --gray-600: #1f5c52;
+    --gray-700: #134039;
+    --gray-800: #0b2925;
+    --gray-900: #061a18;
+    --shadow-sm: 0 1px 3px rgba(5, 150, 105, 0.06);
+    --shadow: 0 2px 8px rgba(5, 150, 105, 0.08), 0 1px 3px rgba(5, 150, 105, 0.05);
+    --shadow-md: 0 6px 20px rgba(5, 150, 105, 0.1), 0 2px 6px rgba(5, 150, 105, 0.06);
+    --shadow-lg: 0 12px 36px rgba(5, 150, 105, 0.12), 0 4px 10px rgba(5, 150, 105, 0.07);
+    --shadow-xl: 0 20px 60px rgba(5, 150, 105, 0.14);
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-2xl: 2rem;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    background-image:
+      linear-gradient(180deg, rgba(5, 150, 105, 0.03) 0px, transparent 400px),
+      radial-gradient(ellipse 80% 40% at 100% 10%, rgba(14, 165, 233, 0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+    color: var(--gray-700);
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240, 253, 244, 0.92);
+    backdrop-filter: blur(20px) saturate(150%);
+    display: flex; align-items: center; gap: 0.25rem;
+    padding: 0.875rem 2rem;
+    border-bottom: 1px solid rgba(5, 150, 105, 0.12);
+    flex-wrap: wrap;
+    box-shadow: 0 2px 12px rgba(5, 150, 105, 0.06);
+  }
+  .nav-brand {
+    font-weight: 700; font-size: 1rem;
+    margin-right: auto;
+    display: flex; align-items: center; gap: 0.75rem;
+    color: var(--primary-dark);
+    letter-spacing: -0.01em;
+  }
+  .nav-brand-logo {
+    height: 2.25rem; width: auto; max-width: 10rem;
+    object-fit: contain;
+    background: var(--white);
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius);
+    border: 1px solid rgba(5, 150, 105, 0.12);
+    box-shadow: var(--shadow-sm);
+  }
+  .nav a {
+    color: var(--gray-400); text-decoration: none;
+    font-size: 0.8125rem; font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
+  }
+  .nav a:hover, .nav a.active {
+    background: rgba(5, 150, 105, 0.08);
+    color: var(--primary);
+  }
+
+  /* ── SLIDE WRAPPER ── */
+  .slide {
+    max-width: 1400px; margin: 1.75rem auto;
+    background: var(--white);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow);
+    padding: 3rem;
+    scroll-margin-top: 5rem;
+    position: relative; overflow: hidden;
+    transition: box-shadow 0.25s ease;
+  }
+  .slide::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary-light));
+    opacity: 0.7;
+  }
+  .slide:hover { box-shadow: var(--shadow-lg); }
+
+  /* ── SLIDE HEADER ── */
+  .slide-header {
+    margin-bottom: 2.5rem; position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .slide-number {
+    display: inline-flex; align-items: center; gap: 0.375rem;
+    color: var(--primary);
+    font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.625rem;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+  .slide-number::before {
+    content: '';
+    display: inline-block;
+    width: 20px; height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+  .slide-title {
+    font-size: 1.875rem; font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1.2; margin-bottom: 0.375rem;
+    letter-spacing: -0.03em;
+  }
+  .slide-subtitle { font-size: 0.9375rem; color: var(--gray-400); font-weight: 400; }
+
+  /* ── KPI CARDS ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1.5rem; margin-bottom: 2.5rem;
+  }
+  .kpi-card {
+    background: var(--white);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+    border-radius: var(--radius-xl);
+    padding: 1.75rem 1.5rem;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 0.625rem;
+  }
+  .kpi-card::after {
+    content: '';
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 80px;
+    background: linear-gradient(270deg, rgba(5, 150, 105, 0.04) 0%, transparent 100%);
+  }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(5, 150, 105, 0.2); }
+  .kpi-card-icon {
+    width: 2.5rem; height: 2.5rem;
+    background: rgba(5, 150, 105, 0.08);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+  }
+  .kpi-label {
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .kpi-value {
+    font-size: 2.5rem; font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1; letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-value.large { font-size: 3.25rem; }
+  .kpi-value.small { font-size: 1.875rem; }
+  .kpi-change {
+    font-size: 0.8125rem; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-change.down { color: var(--red); background: rgba(220, 38, 38, 0.07); }
+  .kpi-change.up   { color: var(--primary); background: rgba(5, 150, 105, 0.08); }
+
+  /* ── INSIGHT BOX ── */
+  .insight-box {
+    background: linear-gradient(135deg, var(--surface-2) 0%, rgba(240, 253, 244, 0.8) 100%);
+    border: 1px solid rgba(5, 150, 105, 0.15);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 2rem;
+    font-size: 0.9125rem; line-height: 1.75;
+    color: var(--gray-600);
+    position: relative;
+  }
+  .insight-box::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 4px 0 0 4px;
+  }
+  .insight-box a {
+    color: var(--primary); font-weight: 600;
+    text-decoration: none; border-bottom: 1px solid rgba(5, 150, 105, 0.25);
+    transition: border-color 0.2s;
+  }
+  .insight-box a:hover { border-bottom-color: var(--primary); }
+  .insight-label {
+    font-size: 0.6875rem; font-weight: 700;
+    color: var(--primary); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 0.625rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .insight-label::before {
+    content: '◈';
+    font-size: 0.75rem;
+  }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-wrap {
+    position: relative; width: 100%; margin-bottom: 2rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    padding: 1.25rem;
+    border: 1px solid rgba(5, 150, 105, 0.08);
+  }
+  .chart-highlight {
+    display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+  }
+  .highlight-card {
+    flex: 1; min-width: 14rem;
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 1.75rem;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 1px solid;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .highlight-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .highlight-card.peak {
+    background: linear-gradient(135deg, #fff7f0 0%, #fff0e6 100%);
+    border-color: rgba(217, 119, 6, 0.25);
+    color: var(--amber);
+  }
+  .highlight-card.cool {
+    background: linear-gradient(135deg, #f0fdf9 0%, #e8faf5 100%);
+    border-color: rgba(5, 150, 105, 0.25);
+    color: var(--primary);
+  }
+  .highlight-card .hc-title {
+    font-size: 0.6875rem; text-transform: uppercase;
+    letter-spacing: 0.1em; opacity: 0.75;
+    font-family: 'DM Mono', monospace;
+  }
+  .highlight-card .hc-value {
+    font-size: 2rem; font-weight: 700; letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── TWO COLUMN ── */
+  .two-col { display: flex; gap: 2.5rem; margin-bottom: 2rem; align-items: flex-start; flex-wrap: wrap; }
+  .col-50 { flex: 1; min-width: 18rem; }
+
+  /* ── TOP CHANNEL BADGE ── */
+  .top-channel-badge {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(14, 165, 233, 0.12) 100%);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1.5rem;
+    font-weight: 700; font-size: 0.9rem;
+    color: #0369a1;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+  .top-channel-badge:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; background: var(--white); }
+  table thead tr th {
+    background: var(--gray-700);
+    color: rgba(255,255,255,0.9);
+    font-weight: 700; font-size: 0.6875rem;
+    padding: 1.125rem 1rem; text-align: center;
+    border: none; text-transform: uppercase; letter-spacing: 0.08em;
+    font-family: 'DM Mono', monospace;
+  }
+  table thead tr th.left { text-align: left; }
+  table thead tr th:first-child { border-top-left-radius: var(--radius-xl); }
+  table thead tr th:last-child  { border-top-right-radius: var(--radius-xl); }
+  table tbody tr:nth-child(even) td { background: var(--gray-50); }
+  table tbody tr:hover td { background: rgba(5, 150, 105, 0.025); }
+  table tbody tr td {
+    padding: 1rem; border: 1px solid rgba(5, 150, 105, 0.06);
+    vertical-align: top; color: var(--gray-600);
+    transition: background-color 0.15s ease;
+  }
+  table tbody tr td.center { text-align: center; }
+  table tbody tr td a { color: var(--primary); font-weight: 600; text-decoration: none; transition: color 0.2s; }
+  table tbody tr td a:hover { color: var(--primary-dark); }
+  .channel-tag {
+    display: inline-block; padding: 0.2rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.6875rem; font-weight: 700; color: #fff;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    font-family: 'DM Mono', monospace;
+  }
+  .tag-tiktok { background: #111; }
+  .tag-facebook { background: #1877f2; }
+  .tag-youtube { background: #ff0000; }
+  .tag-news { background: var(--amber); }
+  .tag-forum { background: var(--gray-500); }
+
+  /* ── SECTION TITLES ── */
+  .chart-title { font-size: 1rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.375rem; letter-spacing: -0.01em; }
+  .chart-subtitle { font-size: 0.875rem; color: var(--gray-400); margin-bottom: 1.25rem; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(5, 150, 105, 0.15), transparent);
+    margin: 2.5rem 0;
+  }
+
+  /* ── STATS BAND (new element for cover context) ── */
+  .stat-band {
+    display: flex; gap: 0; margin: 0 0 2.5rem 0;
+    border: 1px solid rgba(5, 150, 105, 0.12);
+    border-radius: var(--radius-xl); overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .stat-band-item {
+    flex: 1; padding: 1.25rem 1.5rem;
+    background: var(--white); text-align: center;
+    border-right: 1px solid rgba(5, 150, 105, 0.08);
+    transition: background 0.2s ease;
+  }
+  .stat-band-item:last-child { border-right: none; }
+  .stat-band-item:hover { background: var(--gray-50); }
+  .stat-band-label { font-size: 0.7rem; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.375rem; }
+  .stat-band-val { font-size: 1.5rem; font-weight: 700; color: var(--gray-800); letter-spacing: -0.03em; }
+
+  /* ── COVER SLIDE ── */
+  .cover-slide {
+    max-width: 1400px; margin: 2rem auto;
+    background: var(--white);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    padding: 0;
+    scroll-margin-top: 5rem;
+    min-height: 44rem;
+    display: flex;
+    position: relative; overflow: hidden;
+  }
+  .cover-left {
+    flex: 0 0 42%;
+    background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+    padding: 4.5rem 3.5rem;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    position: relative; overflow: hidden;
+    color: white;
+  }
+  .cover-left::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 60%);
+    border-radius: 50%;
+  }
+  .cover-left::after {
+    content: '';
+    position: absolute; bottom: -40px; left: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 60%);
+    border-radius: 50%;
+  }
+  .cover-left-content { position: relative; z-index: 1; }
+  .cover-right {
+    flex: 1;
+    padding: 4.5rem 3.5rem;
+    display: flex; flex-direction: column; justify-content: center;
+    background: var(--white);
+    position: relative;
+  }
+  .cover-right::before {
+    content: '';
+    position: absolute; top: 0; bottom: 0; left: 0; width: 2px;
+    background: linear-gradient(180deg, transparent, rgba(5, 150, 105, 0.15), transparent);
+  }
+  .cover-logo {
+    height: 3.25rem; width: auto; max-width: 13rem;
+    object-fit: contain;
+    background: rgba(255,255,255,0.15);
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 3rem;
+  }
+  .cover-eyebrow {
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .cover-eyebrow::before {
+    content: '';
+    width: 24px; height: 2px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 2px;
+  }
+  .cover-title {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: white;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.1);
+  }
+  .cover-meta {
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .cover-date-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0.625rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.9375rem; font-weight: 600;
+    width: fit-content;
+    font-family: 'DM Mono', monospace;
+  }
+  .cover-right-label {
+    font-size: 0.6875rem; font-weight: 700;
+    color: var(--gray-400); letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .cover-right-title {
+    font-size: clamp(1.75rem, 3vw, 2.75rem);
+    font-weight: 700; letter-spacing: -0.04em;
+    color: var(--gray-800);
+    line-height: 1.15; margin-bottom: 2rem;
+  }
+  .cover-right-title span { color: var(--primary); }
+  .cover-right-date {
+    font-size: 1.125rem; font-weight: 500;
+    color: var(--gray-500);
+    background: var(--gray-50);
+    padding: 0.875rem 1.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+    display: inline-block; margin-bottom: 1.25rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .cover-powered {
+    font-size: 0.875rem; font-weight: 600;
+    color: var(--primary);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .cover-powered::before {
+    content: '◈';
+    opacity: 0.6;
+  }
+
+  /* ── CONTACT SLIDE ── */
+  .contact-slide {
+    max-width: 1400px; margin: 2rem auto;
+    background: var(--white);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    padding: 5rem 3.5rem;
+    scroll-margin-top: 5rem;
+    min-height: 36rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .contact-slide::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary-light));
+  }
+  .contact-slide::after {
+    content: '';
+    position: absolute; bottom: 0; right: 0;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(5, 150, 105, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .contact-content { position: relative; z-index: 1; }
+  .contact-title {
+    font-size: clamp(2.25rem, 6vw, 3.75rem); font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 3rem; line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+  .contact-title span { color: var(--primary); }
+  .contact-features { list-style: none; margin-bottom: 3.5rem; }
+  .contact-features li {
+    font-size: 1.25rem; font-weight: 500;
+    margin-bottom: 1.25rem;
+    padding-left: 2rem;
+    position: relative; line-height: 1.4;
+    color: var(--gray-600);
+  }
+  .contact-features li::before {
+    content: '◆';
+    position: absolute; left: 0;
+    font-size: 0.875rem;
+    color: var(--primary); top: 0.25rem;
+  }
+  .contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem; max-width: 56rem;
+  }
+  .contact-item {
+    text-align: center; padding: 1.5rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(5, 150, 105, 0.1);
+    transition: all 0.3s ease;
+  }
+  .contact-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background: var(--surface-2);
+    border-color: rgba(5, 150, 105, 0.2);
+  }
+  .contact-label {
+    font-size: 0.6875rem; font-weight: 700;
+    color: var(--gray-400); margin-bottom: 0.625rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: 'DM Mono', monospace;
+  }
+  .contact-value { font-size: 1rem; font-weight: 700; color: var(--gray-700); line-height: 1.4; }
+
+  /* ── IMAGE CONTAINER ── */
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+  }
+  .glossary-image {
+    max-width: 100%; height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+  }
+  .glossary-image:hover { transform: scale(1.02); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; font-size: 0.75rem;
+    color: var(--gray-400);
+    padding: 1.75rem 2rem; margin-top: 1rem;
+    font-weight: 500;
+    background: var(--white);
+    border-top: 1px solid rgba(5, 150, 105, 0.08);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 900px) {
+    .cover-slide { flex-direction: column; min-height: auto; }
+    .cover-left { flex: none; min-height: 18rem; }
+    .cover-right::before { display: none; }
+  }
+  @media (max-width: 768px) {
+    .slide { padding: 2rem; margin: 1rem; }
+    .contact-slide { padding: 3rem 2rem; margin: 1rem; }
+    .cover-left, .cover-right { padding: 3rem 2rem; }
+    .two-col { flex-direction: column; }
+    .kpi-row { grid-template-columns: 1fr; }
+    .contact-info { grid-template-columns: 1fr; max-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .slide, .contact-slide { padding: 1.5rem; margin: 0.5rem; }
+    .kpi-card { padding: 1.375rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    {% if report_metadata.brand_logo %}
+      <img src="{{ report_metadata.brand_logo }}" alt="{{ report_metadata.brand }}" class="nav-brand-logo">
+    {% else %}
+      <span>{{ report_metadata.brand }}</span>
+    {% endif %}
+  </div>
+  <a href="#cover">Cover</a>
+  <a href="#slide1">Overview</a>
+  <a href="#slide2">Trendline</a>
+  <a href="#slide3">Channel</a>
+  <a href="#slide4">Sentiment</a>
+  <a href="#slide5">Top Posts</a>
+  <a href="#slide6">Terminology</a>
+  <a href="#slide7">Contact</a>
+</nav>
+
+<!-- COVER -->
+<section class="cover-slide" id="cover">
+  <div class="cover-left">
+    <div class="cover-left-content">
+      {% if report_metadata.brand_logo %}
+        <img src="{{ report_metadata.brand_logo }}" alt="{{ report_metadata.brand }}" class="cover-logo">
+      {% endif %}
+      <div class="cover-eyebrow">Social Listening Report</div>
+      <div class="cover-title">{{ report_metadata.report_name if report_metadata.report_name else 'Daily Report' }}</div>
+      <div class="cover-meta">
+        <div class="cover-date-pill">{{ report_metadata.report_date }}</div>
+      </div>
+    </div>
+    <div style="position:relative;z-index:1;font-size:.8125rem;opacity:.75;font-family:'DM Mono',monospace;">
+      Powered by Kompa.ai
+    </div>
+  </div>
+  <div class="cover-right">
+    <div class="cover-right-label">Brand Analysis</div>
+    <div class="cover-right-title">Phân tích<br><span>{{ report_metadata.brand }}</span></div>
+    <div class="cover-right-date">{{ report_metadata.report_date }}</div>
+    <div class="cover-powered">Được tạo bởi Kompa.ai</div>
+  </div>
+</section>
+
+<!-- SLIDE 1 – BRAND OVERVIEW -->
+<section class="slide" id="slide1">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 1 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_1.title }}</div>
+    <div class="slide-subtitle">{{ slide_1.subtitle }}</div>
+  </div>
+
+  <div class="kpi-row">
+    {% set buzz_item = slide_1.data | selectattr('type', 'equalto', 'buzz') | first %}
+    {% set post_item = slide_1.data | selectattr('type', 'equalto', 'post') | first %}
+    {% set comments_item = slide_1.data | selectattr('type', 'equalto', 'comments') | first %}
+    {% set ordered_items = [buzz_item, post_item, comments_item] %}
+    {% for item in ordered_items %}{% if item %}
+    <div class="kpi-card">
+      <div class="kpi-card-icon">{% if item.type == 'buzz' %}📊{% elif item.type == 'post' %}📝{% else %}💬{% endif %}</div>
+      <div class="kpi-label">{{ item.label }}</div>
+      <div class="kpi-value {% if item.type == 'buzz' %}large{% else %}small{% endif %}">{{ "{:,}".format(item.today) }}</div>
+      <div class="kpi-change {% if item.change_pct < 0 %}down{% else %}up{% endif %}">
+        {% if item.change_pct < 0 %}↓{% else %}↑{% endif %} {{ "%.2f"|format(item.change_pct|abs) }}%
+      </div>
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_1.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 2 – TRENDLINE -->
+<section class="slide" id="slide2">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 2 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_2.title }}</div>
+    <div class="slide-subtitle">{{ slide_2.subtitle }}</div>
+  </div>
+
+  <div class="chart-highlight">
+    <div class="highlight-card peak">
+      <div class="hc-title">▲ Đỉnh thảo luận</div>
+      <div class="hc-value">{{ "{:,}".format(slide_2.peak_day.buzz) }}</div>
+      <div style="font-size:12px;opacity:.7;font-family:'DM Mono',monospace;">{{ slide_2.peak_day.date }}</div>
+    </div>
+    <div class="highlight-card cool">
+      <div class="hc-title">◈ Trạng thái hiện tại</div>
+      <div class="hc-value">{{ "{:,}".format(slide_2.current_day.buzz) }}</div>
+      <div style="font-size:12px;opacity:.7;font-family:'DM Mono',monospace;">{{ slide_2.current_day.date }} — {% if slide_2.current_day.is_still_hot %}Vẫn nóng{% else %}Đã hạ nhiệt{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap" style="height:320px;">
+    <canvas id="trendChart"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_2.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 3 – CHANNEL BREAKDOWN -->
+<section class="slide" id="slide3">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 3 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_3.title }}</div>
+    <div class="slide-subtitle">{{ slide_3.subtitle }}</div>
+  </div>
+
+  <div class="top-channel-badge">◆ Kênh dẫn đầu: {{ slide_3.top_channel }} &nbsp;—&nbsp; {{ "{:,}".format(slide_3.channel_distribution[0].today_buzz) }} thảo luận</div>
+
+  <div class="chart-wrap" style="height:380px;">
+    <canvas id="channelChart"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_3.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 4 – SENTIMENT -->
+<section class="slide" id="slide4">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 4 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_4.title }}</div>
+    <div class="slide-subtitle">{{ slide_4.subtitle }}</div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-50">
+      <div class="chart-title">Phân bố sắc thái thảo luận</div>
+      <div class="chart-subtitle">Tổng {{ "{:,}".format(slide_4.sentiment_distribution|sum(attribute='Count')) }} thảo luận</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="sentPieChart"></canvas>
+      </div>
+    </div>
+    <div class="col-50">
+      <div class="chart-title">Sắc thái theo kênh</div>
+      <div class="chart-subtitle">Top kênh theo tổng thảo luận</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="sentStackedChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">Insight</div>
+    {{ slide_4.insight|markdown_links|safe }}
+  </div>
+</section>
+
+<!-- SLIDE 5 – TOP POSTS -->
+<section class="slide" id="slide5">
+  <div class="slide-header">
+    <div class="slide-number">SLIDE 5 / {{ report_metadata.total_slides }}</div>
+    <div class="slide-title">{{ slide_5.title }}</div>
+    <div class="slide-subtitle">{{ slide_5.subtitle }}</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">STT</th>
+          <th class="left" style="width:45%;">Nội dung bài đăng</th>
+          <th style="width:100px;">Ngày đăng</th>
+          <th style="width:90px;">Kênh</th>
+          <th style="width:150px;">Người đăng</th>
+          <th style="width:110px;">Số bình luận</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in slide_5.top_posts %}
+        <tr>
+          <td class="center" style="font-weight:700;color:var(--primary);font-family:'DM Mono',monospace;">{{ post.stt }}</td>
+          <td>{{ post.noi_dung_bai_dang[:100] }}{% if post.noi_dung_bai_dang|length > 100 %}...{% endif %}
+            <br><a href="{{ post.url_topic }}" target="_blank">◆ Link</a>
+          </td>
+          <td class="center" style="font-family:'DM Mono',monospace;font-size:12px;">{{ post.ngay_dang[:10] }}</td>
+          <td class="center"><span class="channel-tag tag-{{ post.kenh.lower() }}">{{ post.kenh }}</span></td>
+          <td class="center" style="font-size:12px;">{{ post.nguoi_dang }}</td>
+          <td class="center" style="font-weight:700;font-size:15px;color:var(--primary);font-family:'DM Mono',monospace;">{{ post.comment_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SLIDE 6 – GLOSSARY -->
+<section class="slide" id="slide6">
+  <div class="slide-header">
+    <div class="slide-title">Thuật ngữ sử dụng trong báo cáo</div>
+  </div>
+  <div class="image-container">
+    <img src="{{ static_url_prefix }}/static/image.jpeg" alt="Thuật ngữ báo cáo" class="glossary-image">
+  </div>
+</section>
+
+<!-- SLIDE 7 – CONTACT -->
+<section class="contact-slide" id="slide7">
+  <div class="contact-content">
+    <div class="contact-title">Xin cảm <span>ơn!</span></div>
+    <ul class="contact-features">
+      <li>Tăng trưởng Thương hiệu bền vững cùng Kompa</li>
+      <li>Phát hiện sớm cơ hội — Ứng phó kịp thời rủi ro — Tối ưu hiệu quả truyền thông</li>
+    </ul>
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="contact-label">Website</div>
+        <div class="contact-value">kompa.ai</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Email</div>
+        <div class="contact-value">info@kompa.ai</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Phone</div>
+        <div class="contact-value">0902 915 510<br><span style="font-size:.875rem;color:var(--gray-400);">Ms Như Tran</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>{{ report_metadata.report_name if report_metadata.report_name else 'Brand Health Analysis' }} &nbsp;·&nbsp; {{ report_metadata.brand }} &nbsp;·&nbsp; {{ report_metadata.report_date }} &nbsp;·&nbsp; Powered by Kompa AI</footer>
+
+<script>
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = '#6aafa0';
+
+/* SLIDE 2: Trendline */
+(function(){
+  const trendData = {{ slide_2.trendline|tojson|safe }};
+  const labels = trendData.map(d => d.date.split('-').slice(1).join('/'));
+  const data = trendData.map(d => d.buzz);
+  const peakDate = '{{ slide_2.peak_day.date }}';
+  const peakIdx = trendData.findIndex(d => d.date === peakDate);
+  const pointBg = data.map((_, i) => i === peakIdx ? '#d97706' : '#059669');
+  const pointR  = data.map((_, i) => i === peakIdx ? 8 : 4);
+
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Thảo luận',
+        data,
+        borderColor: '#059669',
+        borderWidth: 2,
+        backgroundColor: (ctx) => {
+          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(5, 150, 105, 0.14)');
+          gradient.addColorStop(1, 'rgba(5, 150, 105, 0.01)');
+          return gradient;
+        },
+        fill: true,
+        tension: 0.35,
+        pointBackgroundColor: pointBg,
+        pointRadius: pointR,
+        pointHoverRadius: 8,
+        pointBorderColor: 'white',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#fff', titleColor: '#134039', bodyColor: '#3d7a6d',
+          borderColor: 'rgba(5, 150, 105, 0.2)', borderWidth: 1,
+          callbacks: { label: ctx => ' ' + ctx.parsed.y.toLocaleString() + ' thảo luận' }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(5, 150, 105, 0.06)', dash: [4,4] } },
+        y: {
+          grid: { color: 'rgba(5, 150, 105, 0.06)', dash: [4,4] },
+          ticks: { callback: v => v.toLocaleString() }
+        }
+      }
+    }
+  });
+})();
+
+/* SLIDE 3: Channel Bar */
+(function(){
+  const channelData = {{ slide_3.channel_distribution|tojson|safe }};
+  const channels = channelData.map(d => d.Channel);
+  const values = channelData.map(d => d.today_buzz);
+  const changes = channelData.map(d => d.change_pct);
+  const shades = ['#059669','#0ea5e9','#34d399','#6ee7b7','#0284c7','#38bdf8','#a3e635'];
+  const chartColors = channels.map((_, i) => shades[i % shades.length]);
+
+  new Chart(document.getElementById('channelChart'), {
+    type: 'bar',
+    data: {
+      labels: channels,
+      datasets: [{ label: 'Thảo luận', data: values, backgroundColor: chartColors, borderRadius: 6, barThickness: 28 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#fff', titleColor: '#134039', bodyColor: '#3d7a6d',
+          borderColor: 'rgba(5, 150, 105, 0.2)', borderWidth: 1,
+          callbacks: { label: ctx => { const i = ctx.dataIndex; const s = changes[i] >= 0 ? '+' : ''; return ` ${ctx.parsed.x.toLocaleString()} (${s}${changes[i]}%)`; } }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(5, 150, 105, 0.06)' }, ticks: { callback: v => v.toLocaleString() } },
+        y: { grid: { display: false } }
+      }
+    },
+    plugins: [{
+      id: 'barLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+        chart.getDatasetMeta(0).data.forEach((bar, i) => {
+          const s = changes[i] >= 0 ? '+' : '';
+          const color = changes[i] >= 0 ? '#059669' : '#dc2626';
+          ctx.textBaseline = 'middle';
+          ctx.font = 'bold 12px DM Sans';
+          ctx.fillStyle = '#134039';
+          ctx.fillText(values[i].toLocaleString(), bar.x + 8, bar.y - 6);
+          ctx.font = '11px DM Mono';
+          ctx.fillStyle = color;
+          ctx.fillText(`${s}${changes[i]}%`, bar.x + 8, bar.y + 8);
+        });
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* SLIDE 4: Donut */
+(function(){
+  const sentData = {{ slide_4.sentiment_distribution|tojson|safe }};
+  const labels = sentData.map(d => d.Sentiment === 'Neutral' ? 'Trung lập' : d.Sentiment === 'Negative' ? 'Tiêu cực' : 'Tích cực');
+  const data = sentData.map(d => d.Count);
+  const colors = ['#a7d3c7', '#059669', '#dc2626'];
+
+  new Chart(document.getElementById('sentPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: colors, borderWidth: 3, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } },
+        tooltip: {
+          backgroundColor: '#fff', titleColor: '#134039', bodyColor: '#3d7a6d',
+          borderColor: 'rgba(5, 150, 105, 0.2)', borderWidth: 1,
+          callbacks: { label: ctx => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); const pct = ((ctx.parsed/total)*100).toFixed(1); return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${pct}%)`; } }
+        }
+      }
+    },
+    plugins: [{
+      id: 'centerText',
+      beforeDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const cx = (left+right)/2, cy = (top+bottom)/2;
+        const total = data.reduce((a,b)=>a+b,0);
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = 'bold 22px DM Sans'; ctx.fillStyle = '#047857';
+        ctx.fillText(total.toLocaleString(), cx, cy - 10);
+        ctx.font = '11px DM Sans'; ctx.fillStyle = '#6aafa0';
+        ctx.fillText('Thảo luận', cx, cy + 12);
+        ctx.restore();
+      }
+    }]
+  });
+})();
+
+/* SLIDE 4: Stacked Bar */
+(function(){
+  const channelSentData = {{ slide_4.channel_sentiment|tojson|safe }};
+  const channels = channelSentData.map(d => d.Channel);
+  const neg = channelSentData.map(d => d.Negative || 0);
+  const neu = channelSentData.map(d => d.Neutral || 0);
+  const pos = channelSentData.map(d => d.Positive || 0);
+  function toPct(arr) { return arr.map((v, i) => { const t=neg[i]+neu[i]+pos[i]; return t===0?0:+((v/t)*100).toFixed(1); }); }
+  new Chart(document.getElementById('sentStackedChart'), {
+    type: 'bar',
+    data: {
+      labels: channels,
+      datasets: [
+        { label: 'Tiêu cực', data: toPct(neg), backgroundColor: '#dc2626', stack: 's1', borderWidth: 0 },
+        { label: 'Trung lập', data: toPct(neu), backgroundColor: '#a7d3c7', stack: 's1', borderWidth: 0 },
+        { label: 'Tích cực',  data: toPct(pos), backgroundColor: '#059669', stack: 's1', borderWidth: 0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { padding: 12, font: { size: 11 } } },
+        tooltip: {
+          backgroundColor: '#fff', titleColor: '#134039', bodyColor: '#3d7a6d',
+          borderColor: 'rgba(5, 150, 105, 0.2)', borderWidth: 1,
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v+'%' }, grid: { color: 'rgba(5, 150, 105, 0.07)' } }
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -247,7 +247,7 @@
     position: relative;
   }
   .insight-box::before {
-    content: '💡';
+    content: '✨';
     position: absolute;
     top: 1rem; right: 1.5rem;
     font-size: 1.5rem;
@@ -663,11 +663,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 2.5rem 0;
-    padding: 1.5rem;
     background: var(--gray-50);
     border-radius: var(--radius-xl);
-    border: 1px solid var(--gray-200);
   }
   .glossary-image {
     max-width: 100%;
@@ -996,7 +993,7 @@
   </div>
  
   <div class="image-container">
-    <img src="/daily/static/image.jpeg" alt="Thuật ngữ báo cáo" class="glossary-image">
+    <img src="{{ static_url_prefix }}/static/image.jpeg" alt="Thuật ngữ báo cáo" class="glossary-image">
   </div>
 </section>
 
@@ -1170,7 +1167,7 @@ Chart.defaults.font.family = "'Inter', sans-serif";
   const labels = sentData.map(d => d.Sentiment === 'Neutral' ? 'Trung lập' : 
                                    d.Sentiment === 'Negative' ? 'Tiêu cực' : 'Tích cực');
   const data = sentData.map(d => d.Count);
-  const colors = ['#6b7280', '#dc2626', '#16a34a']; // neutral, negative, positive
+  const colors = ['#6b7280', '#16a34a', '#dc2626']; // neutral, negative, positive
 
   new Chart(document.getElementById('sentPieChart'), {
     type: 'doughnut',

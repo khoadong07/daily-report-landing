@@ -383,6 +383,29 @@
             box-shadow: var(--shadow);
         }
         
+        .delete-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+        
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        
         .roadmap {
             display: flex;
             justify-content: space-between;
@@ -572,6 +595,156 @@
             transition: width 0.3s ease;
         }
         
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            max-width: 28rem;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: slideInUp 0.3s ease-out;
+        }
+        
+        .modal-header {
+            padding: 1.5rem 1.5rem 0;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modal-body {
+            padding: 0 1.5rem;
+            color: var(--gray-700);
+        }
+        
+        .modal-body p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .report-info {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+        
+        .warning-text {
+            color: var(--warning);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 1.5rem;
+        }
+        
+        .btn.danger {
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn.danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--gray-200);
+            padding: 1rem 1.5rem;
+            display: none;
+            z-index: 10001;
+            min-width: 20rem;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
         #uploadError {
             background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
             color: white;
@@ -747,6 +920,22 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="templateSelect">Report Template:</label>
+                        <select id="templateSelect" name="template" required style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; width: 100%;" onchange="showTemplatePreview(this.value)">
+                            <option value="report_template.html">Default - Professional Blue</option>
+                            <option value="report_template_aurora.html">Aurora - Purple Gradient</option>
+                            <option value="report_template_clarity.html">Clarity - Clean Green</option>
+                            <option value="report_template_dark.html">Dark - Cyberpunk Style</option>
+                        </select>
+                        <small style="color: var(--gray-500); font-size: 0.75rem; margin-top: 0.5rem; display: block;">
+                            Choose the visual style for your report
+                        </small>
+                        <div id="templatePreview" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius); border: 1px solid var(--gray-200);">
+                            <div id="templatePreviewContent"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="brandLogo">Brand Logo (optional):</label>
                         <input type="file" id="brandLogo" name="brand_logo" accept=".png,.jpg,.jpeg,.svg" style="padding: 8px;" onchange="previewLogo(this)">
                         <small style="color: var(--gray-500); font-size: 0.75rem; margin-top: 0.5rem; display: block;">
@@ -778,7 +967,7 @@
             </div>
             
             <div id="uploadMessage" class="success-message">
-                <h3>Report generated successfully from API!</h3>
+                <h3>Report generated successfully!</h3>
                 <div class="link-box">
                     <strong>Access Link:</strong><br>
                     <a id="uploadReportLink" href="#" target="_blank"></a>
@@ -808,8 +997,36 @@
             </div>
         </div>
         
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🗑️ Delete Report</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this report?</p>
+                    <div class="report-info">
+                        <strong id="deleteReportName"></strong>
+                    </div>
+                    <p class="warning-text">⚠️ This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn secondary" onclick="closeDeleteModal()">Cancel</button>
+                    <button type="button" class="btn danger" onclick="confirmDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Success/Error Toast -->
+        <div id="toast" class="toast">
+            <div class="toast-content">
+                <span id="toastIcon"></span>
+                <span id="toastMessage"></span>
+            </div>
+        </div>
+        
         <div class="main-card">
-            <h2>📁 Reports List</h2>
+            <h2>Reports List</h2>
             <div id="reportsList" class="reports-list"></div>
         </div>
     </div>
@@ -820,6 +1037,9 @@
         
         // Set default date to today
         document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+        
+        // Show default template preview
+        showTemplatePreview('report_template.html');
         
         async function loadReports() {
             try {
@@ -836,7 +1056,10 @@
                 listDiv.innerHTML = reports.map(report => `
                     <div class="report-item">
                         <a href="${report.url}" target="_blank">${report.filename}</a>
-                        <button class="copy-btn" onclick="copyToClipboard('https://service-ai.radaa.net/daily${report.url}')">Copy</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="copy-btn" onclick="copyToClipboard('${report.full_url}')">Copy</button>
+                            <button class="delete-btn" onclick="deleteReport('${report.filename}')" title="Delete report">🗑️</button>
+                        </div>
                     </div>
                 `).join('');
             } catch (error) {
@@ -848,11 +1071,88 @@
             // Replace 0.0.0.0 with localhost if present
             const fixedText = text.replace('0.0.0.0', 'localhost');
             navigator.clipboard.writeText(fixedText).then(() => {
-                alert('✅ Link copied!');
+                showToast('✅', 'Link copied to clipboard!', 'success');
             }).catch(err => {
                 console.error('Copy failed:', err);
+                showToast('❌', 'Failed to copy link', 'error');
             });
         }
+        
+        let deleteReportFilename = null;
+        
+        function deleteReport(filename) {
+            deleteReportFilename = filename;
+            document.getElementById('deleteReportName').textContent = filename;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            deleteReportFilename = null;
+        }
+        
+        async function confirmDelete() {
+            if (!deleteReportFilename) return;
+            
+            try {
+                const response = await fetch(`/api/reports/${deleteReportFilename}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                closeDeleteModal();
+                
+                if (result.success) {
+                    showToast('✅', 'Report deleted successfully!', 'success');
+                    // Reload the reports list
+                    loadReports();
+                } else {
+                    showToast('❌', 'Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Delete failed:', error);
+                closeDeleteModal();
+                showToast('❌', 'Failed to delete report: ' + error.message, 'error');
+            }
+        }
+        
+        function showToast(icon, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastIcon.textContent = icon;
+            toastMessage.textContent = message;
+            
+            // Remove existing type classes
+            toast.classList.remove('success', 'error');
+            // Add new type class
+            toast.classList.add(type, 'show');
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.style.animation = '';
+                }, 300);
+            }, 3000);
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('deleteModal').classList.contains('show')) {
+                closeDeleteModal();
+            }
+        });
         
         function showLoading(text = 'Processing...', description = 'Please wait a moment') {
             document.getElementById('loadingText').textContent = text;
@@ -892,31 +1192,55 @@
             e.preventDefault();
             
             if (!uploadedFile) {
-                alert('Please upload file and extract topics first');
+                showToast('⚠️', 'Please upload file and extract topics first', 'error');
                 return;
             }
             
             // Update roadmap to step 3
             updateRoadmap(3);
             
-            const formData = new FormData();
+            // Get form element and create FormData from it
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+            
+            // Add the uploaded file (since it's not part of the form)
+            formData.append('file', uploadedFile);
+            
+            // Get values for logging
             const brandName = document.getElementById('selectedTopic').value;
             const reportName = document.getElementById('reportName').value;
             const reportDate = document.getElementById('reportDate').value;
             const reportTime = document.getElementById('reportTime').value;
+            const templateName = document.getElementById('templateSelect').value;
             
+            console.log('Selected template value:', templateName);
+            console.log('Template select element:', document.getElementById('templateSelect'));
+            console.log('Template select exists:', !!document.getElementById('templateSelect'));
+            console.log('Template select value property:', document.getElementById('templateSelect')?.value);
+            console.log('Template select selectedIndex:', document.getElementById('templateSelect')?.selectedIndex);
+            console.log('All template options:', Array.from(document.getElementById('templateSelect').options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})));
+            
+            // Validate template selection
+            if (!templateName) {
+                console.error('Template name is empty or undefined!');
+                showToast('⚠️', 'Please select a template', 'error');
+                return;
+            }
             // Validate inputs
             if (!brandName || !reportName || !reportDate) {
-                alert('Please fill in all required information');
+                showToast('⚠️', 'Please fill in all required information', 'error');
                 return;
             }
             
-            // Prepare form data with the previously uploaded file
-            formData.append('file', uploadedFile);
-            formData.append('brand_name', brandName);
-            formData.append('report_name', reportName);
-            formData.append('report_date', reportDate);
-            formData.append('report_time', reportTime);
+            console.log('Form data prepared:', {
+                brandName, reportName, reportDate, reportTime, templateName
+            });
+            
+            // Debug: Log all form data entries
+            console.log('FormData entries:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
             
             // Add logo file if selected
             const logoFile = document.getElementById('brandLogo').files[0];
@@ -1044,7 +1368,7 @@
             const fileInput = document.getElementById('excelFile');
             
             if (!fileInput.files[0]) {
-                alert('Please select an Excel file first');
+                showToast('⚠️', 'Please select an Excel file first', 'error');
                 return;
             }
             
@@ -1095,13 +1419,13 @@
                     document.getElementById('extractInfo').style.display = 'block';
                     
                 } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                    showToast('❌', 'Error: ' + (data.error || 'Unknown error'), 'error');
                     if (data.available_columns) {
-                        alert('Available columns: ' + data.available_columns.join(', '));
+                        showToast('ℹ️', 'Available columns: ' + data.available_columns.join(', '), 'error');
                     }
                 }
             } catch (error) {
-                alert('Connection error: ' + error.message);
+                showToast('❌', 'Connection error: ' + error.message, 'error');
             } finally {
                 // Hide loading
                 hideLoading();
@@ -1116,7 +1440,7 @@
             const selectedTopic = document.getElementById('topicDropdown').value;
             
             if (!selectedTopic) {
-                alert('Please select a topic');
+                showToast('⚠️', 'Please select a topic', 'error');
                 return;
             }
             
@@ -1163,7 +1487,7 @@
                 
                 // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('File too large! Please select a file smaller than 5MB.');
+                    showToast('⚠️', 'File too large! Please select a file smaller than 5MB.', 'error');
                     input.value = '';
                     return;
                 }
@@ -1171,7 +1495,7 @@
                 // Validate file type
                 const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
                 if (!allowedTypes.includes(file.type)) {
-                    alert('Unsupported file format! Please select PNG, JPG, JPEG or SVG file.');
+                    showToast('⚠️', 'Unsupported file format! Please select PNG, JPG, JPEG or SVG file.', 'error');
                     input.value = '';
                     return;
                 }
@@ -1190,6 +1514,50 @@
         function removeLogo() {
             document.getElementById('brandLogo').value = '';
             document.getElementById('logoPreview').style.display = 'none';
+        }
+        
+        function showTemplatePreview(templateName) {
+            const preview = document.getElementById('templatePreview');
+            const content = document.getElementById('templatePreviewContent');
+            
+            const templateDescriptions = {
+                'report_template.html': {
+                    name: 'Default - Professional Blue',
+                    description: 'Clean and professional design with blue color scheme. Perfect for corporate reports.',
+                    color: '#4BADED'
+                },
+                'report_template_aurora.html': {
+                    name: 'Aurora - Purple Gradient',
+                    description: 'Modern gradient design with purple and pink colors. Eye-catching and vibrant.',
+                    color: '#7c3aed'
+                },
+                'report_template_clarity.html': {
+                    name: 'Clarity - Clean Green',
+                    description: 'Minimalist design with green accents. Clean and easy to read.',
+                    color: '#059669'
+                },
+                'report_template_dark.html': {
+                    name: 'Dark - Cyberpunk Style',
+                    description: 'Dark theme with neon accents. Modern and tech-focused design.',
+                    color: '#00e5ff'
+                }
+            };
+            
+            const template = templateDescriptions[templateName];
+            if (template) {
+                content.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 20px; height: 20px; background: ${template.color}; border-radius: 50%;"></div>
+                        <div>
+                            <strong>${template.name}</strong><br>
+                            <small style="color: var(--gray-600);">${template.description}</small>
+                        </div>
+                    </div>
+                `;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
         }
     </script>
 </body>

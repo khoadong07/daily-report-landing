@@ -12,13 +12,19 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+# Get the absolute path to the current directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
 # Configuration from environment variables
 API_BASE_URL = os.getenv('API_BASE_URL', 'http://148.113.218.245:8524')
 API_GENERATE_ENDPOINT = os.getenv('API_GENERATE_ENDPOINT', '/api/generate-daily')
 API_HEALTH_ENDPOINT = os.getenv('API_HEALTH_ENDPOINT', '/health')
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'https://service-ai.radaa.net/daily')
+STATIC_URL_PREFIX = os.getenv('STATIC_URL_PREFIX', '')
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 API_TIMEOUT = int(os.getenv('API_TIMEOUT', '300'))
 HOST = os.getenv('HOST', '0.0.0.0')
 PORT = int(os.getenv('PORT', '8000'))
@@ -125,7 +131,7 @@ def test_logo_upload():
         logo_path = os.path.join(LOGOS_DIR, logo_filename)
         
         logo_file.save(logo_path)
-        logo_url = f"/daily/static/logos/{logo_filename}"
+        logo_url = f"{STATIC_URL_PREFIX}/static/logos/{logo_filename}"
         
         return jsonify({
             'success': True,
@@ -138,6 +144,8 @@ def test_logo_upload():
         print(f"Error in test logo upload: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# Routes for static files - support both local and production
+@app.route('/static/logos/<filename>')
 @app.route('/daily/static/logos/<filename>')
 def serve_logo(filename):
     """Serve logo files"""
@@ -152,6 +160,7 @@ def serve_logo(filename):
         print(f"Error serving logo {filename}: {str(e)}")
         return "Error serving logo", 500
 
+@app.route('/static/<filename>')
 @app.route('/daily/static/<filename>')
 def serve_static(filename):
     """Serve static files"""
@@ -248,7 +257,7 @@ def generate_from_upload():
                     
                     try:
                         logo_file.save(logo_path)
-                        logo_url = f"/daily/static/logos/{logo_filename}"
+                        logo_url = f"{STATIC_URL_PREFIX}/static/logos/{logo_filename}"
                         print(f"Logo saved successfully: {logo_path}")
                         print(f"Logo URL: {logo_url}")
                     except Exception as e:
@@ -267,13 +276,41 @@ def generate_from_upload():
         report_name = request.form.get('report_name', '')
         report_date = request.form.get('report_date', '')
         report_time = request.form.get('report_time', '10:00')
+        template_name = request.form.get('template', 'report_template.html')
         show_interactions = 'false'  # Default value
         
-        print(f"Parameters: brand_name={brand_name}, report_name={report_name}, report_date={report_date}")
+        print(f"=== Form Parameters Debug ===")
+        print(f"Request method: {request.method}")
+        print(f"Content-Type: {request.content_type}")
+        print(f"All form keys: {list(request.form.keys())}")
+        print(f"All files keys: {list(request.files.keys())}")
+        for key, value in request.form.items():
+            print(f"  {key}: '{value}' (type: {type(value)})")
+        print(f"Raw template value from form: '{request.form.get('template')}'")
+        print(f"Template with default: '{request.form.get('template', 'DEFAULT_FALLBACK')}'")
+        print(f"=============================")
+        
+        print(f"Parameters: brand_name={brand_name}, report_name={report_name}, report_date={report_date}, template={template_name}")
         
         if not brand_name or not report_name or not report_date:
             print("Error: Missing required parameters")
             return jsonify({'error': 'Brand name, report name and report date are required'}), 400
+        
+        # Validate template name for security
+        allowed_templates = [
+            'report_template.html',
+            'report_template_aurora.html', 
+            'report_template_clarity.html',
+            'report_template_dark.html'
+        ]
+        original_template = template_name
+        if template_name not in allowed_templates:
+            print(f"Invalid template: {template_name}, using default")
+            template_name = 'report_template.html'
+        else:
+            print(f"Template validation passed: {template_name}")
+        
+        print(f"Final template to use: {template_name} (original: {original_template})")
         
         # Prepare the API call using environment variables
         api_url = f"{API_BASE_URL}{API_GENERATE_ENDPOINT}"
@@ -350,10 +387,27 @@ def generate_from_upload():
         
         print(f"Generating report with filename: {filename}")
         
+        # Add static_url_prefix to template context
+        api_data['static_url_prefix'] = STATIC_URL_PREFIX
+        
         # Render the template with API data
         try:
-            html_content = render_template('report_template.html', **api_data)
-            print("Template rendered successfully")
+            print(f"Template folder: {app.template_folder}")
+            print(f"Looking for template: {template_name}")
+            template_path = os.path.join(app.template_folder, template_name)
+            print(f"Full template path: {template_path}")
+            print(f"Template exists: {os.path.exists(template_path)}")
+            
+            # Fallback to default template if selected template doesn't exist
+            if not os.path.exists(template_path):
+                print(f"Template {template_name} not found, falling back to default")
+                template_name = 'report_template.html'
+                template_path = os.path.join(app.template_folder, template_name)
+                print(f"Fallback template path: {template_path}")
+                print(f"Fallback template exists: {os.path.exists(template_path)}")
+            
+            html_content = render_template(template_name, **api_data)
+            print(f"Template {template_name} rendered successfully")
         except Exception as e:
             print(f"Template rendering error: {str(e)}")
             return jsonify({'error': f'Error generating report template: {str(e)}'}), 500
@@ -384,7 +438,8 @@ def generate_from_upload():
             'filename': filename,
             'url': url,
             'full_url': full_url,
-            'path': report_path
+            'path': report_path,
+            'template_used': template_name
         })
         
     except Exception as e:
@@ -397,6 +452,9 @@ def generate_from_upload():
 def generate_report():
     """Generate report from data.json using template"""
     try:
+        # Get template parameter from query string
+        template_name = request.args.get('template', 'report_template.html')
+        
         # Load data from JSON file
         with open('data.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -406,8 +464,30 @@ def generate_report():
         brand_slug = data['report_metadata']['brand'].lower().replace(' ', '-').replace('ă', 'a').replace('ầ', 'au')
         filename = f"{brand_slug}-{timestamp}.html"
         
-        # Render the template with data
-        html_content = render_template('report_template.html', **data)
+        # Add static_url_prefix to template context
+        data['static_url_prefix'] = STATIC_URL_PREFIX
+        
+        # Render the selected template with data
+        try:
+            print(f"Template folder: {app.template_folder}")
+            print(f"Looking for template: {template_name}")
+            template_path = os.path.join(app.template_folder, template_name)
+            print(f"Full template path: {template_path}")
+            print(f"Template exists: {os.path.exists(template_path)}")
+            
+            # Fallback to default template if selected template doesn't exist
+            if not os.path.exists(template_path):
+                print(f"Template {template_name} not found, falling back to default")
+                template_name = 'report_template.html'
+                template_path = os.path.join(app.template_folder, template_name)
+                print(f"Fallback template path: {template_path}")
+                print(f"Fallback template exists: {os.path.exists(template_path)}")
+            
+            html_content = render_template(template_name, **data)
+            print(f"Template {template_name} rendered successfully")
+        except Exception as e:
+            print(f"Template rendering error: {str(e)}")
+            return jsonify({'error': f'Error generating report template: {str(e)}'}), 500
         
         # Save the report
         report_path = os.path.join(REPORTS_DIR, filename)
@@ -428,7 +508,8 @@ def generate_report():
             'filename': filename,
             'url': url,
             'full_url': full_url,
-            'path': report_path
+            'path': report_path,
+            'template_used': template_name
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -440,6 +521,9 @@ def preview_report():
         # Load data from JSON file
         with open('data.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
+        
+        # Add static_url_prefix to template context
+        data['static_url_prefix'] = STATIC_URL_PREFIX
         
         # Render template directly for preview
         return render_template('report_template.html', **data)
@@ -488,10 +572,107 @@ def view_report(filename):
             return f.read()
     return "Report not found", 404
 
+@app.route('/api/test-form', methods=['POST'])
+def test_form():
+    """Test form submission to debug template parameter"""
+    try:
+        print("=== Test Form Submission ===")
+        print(f"Content-Type: {request.content_type}")
+        print(f"Form keys: {list(request.form.keys())}")
+        print(f"Files keys: {list(request.files.keys())}")
+        
+        form_data = {}
+        for key, value in request.form.items():
+            form_data[key] = value
+            print(f"  {key}: {value}")
+        
+        template_param = request.form.get('template', 'NOT_FOUND')
+        print(f"Template parameter: '{template_param}'")
+        
+        return jsonify({
+            'success': True,
+            'form_data': form_data,
+            'template_param': template_param,
+            'all_keys': list(request.form.keys())
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/templates')
+def list_templates():
+    """List available templates for debugging"""
+    try:
+        template_dir = app.template_folder
+        print(f"Template directory: {template_dir}")
+        
+        if not os.path.exists(template_dir):
+            return jsonify({'error': f'Template directory does not exist: {template_dir}'}), 404
+        
+        templates = []
+        for file in os.listdir(template_dir):
+            if file.endswith('.html') and file.startswith('report_template'):
+                file_path = os.path.join(template_dir, file)
+                templates.append({
+                    'name': file,
+                    'path': file_path,
+                    'exists': os.path.exists(file_path),
+                    'size': os.path.getsize(file_path) if os.path.exists(file_path) else 0
+                })
+        
+        return jsonify({
+            'template_folder': template_dir,
+            'templates': templates,
+            'total_templates': len(templates)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/reports/<filename>', methods=['DELETE'])
+def delete_report(filename):
+    """Delete a specific report file"""
+    try:
+        # Validate filename to prevent directory traversal
+        if not filename.endswith('.html') or '/' in filename or '\\' in filename:
+            return jsonify({'error': 'Invalid filename'}), 400
+        
+        file_path = os.path.join(REPORTS_DIR, filename)
+        
+        # Check if file exists
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'Report not found'}), 404
+        
+        # Delete the file
+        os.remove(file_path)
+        print(f"Report deleted: {file_path}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Report {filename} deleted successfully'
+        })
+        
+    except Exception as e:
+        print(f"Error deleting report: {str(e)}")
+        return jsonify({'error': f'Failed to delete report: {str(e)}'}), 500
+
 @app.route('/api/reports')
 def list_reports():
     files = os.listdir(REPORTS_DIR)
-    reports = [{'filename': f, 'url': f"/report/{f}"} for f in files if f.endswith('.html')]
+    reports = []
+    for f in files:
+        if f.endswith('.html'):
+            url = f"/report/{f}"
+            # Generate full URL using environment variable
+            if APP_BASE_URL and APP_BASE_URL != 'http://localhost:8000':
+                full_url = f"{APP_BASE_URL}{url}"
+            else:
+                host = request.host.replace('0.0.0.0', 'localhost')
+                full_url = f"http://{host}{url}"
+            
+            reports.append({
+                'filename': f, 
+                'url': url,
+                'full_url': full_url
+            })
     return jsonify(reports)
 
 if __name__ == '__main__':
@@ -499,4 +680,24 @@ if __name__ == '__main__':
     print(f"API Base URL: {API_BASE_URL}")
     print(f"App Base URL: {APP_BASE_URL}")
     print(f"Debug mode: {DEBUG}")
+    print(f"Template folder: {app.template_folder}")
+    
+    # Check if template files exist
+    required_templates = [
+        'report_template.html',
+        'report_template_aurora.html', 
+        'report_template_clarity.html',
+        'report_template_dark.html'
+    ]
+    
+    print("\n=== Template Check ===")
+    for template in required_templates:
+        template_path = os.path.join(app.template_folder, template)
+        exists = os.path.exists(template_path)
+        print(f"{template}: {'✓' if exists else '✗'} ({template_path})")
+        if not exists:
+            print(f"WARNING: Template {template} not found!")
+    
+    print("======================\n")
+    
     app.run(host=HOST, port=PORT, debug=DEBUG, threaded=True)
