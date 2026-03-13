@@ -14,6 +14,13 @@
             "show_interactions": false,
             "data": [
                 {
+                    "type": "buzz",
+                    "label": "Tổng thảo luận",
+                    "today": 14274,
+                    "yesterday": 32631,
+                    "change_pct": -56.26
+                },
+                {
                     "type": "post",
                     "label": "Tổng bài đăng",
                     "today": 1962,
@@ -26,13 +33,6 @@
                     "today": 12312,
                     "yesterday": 30097,
                     "change_pct": -59.09
-                },
-                {
-                    "type": "buzz",
-                    "label": "Tổng thảo luận",
-                    "today": 14274,
-                    "yesterday": 32631,
-                    "change_pct": -56.26
                 }
             ],
             "insight": "Tổng cộng có 14274 thảo luận về Ngành Xăng Dầu trong vòng 24 giờ qua, giảm 56.3% so với ngày trước đó [Nguồn](http://facebook.com/100023242184072_2138267760291276). Sự kiện chính là căng thẳng leo thang tại Trung Đông và các cuộc tấn công vào cơ sở hạ tầng dầu mỏ của Iran [Nguồn](http://facebook.com/847517991786334_122121896337143825). Thông tin lan truyền nhanh chóng trên Facebook và TikTok, tập trung vào lo ngại về gián đoạn nguồn cung và tăng giá [Nguồn](https://www.tiktok.com/@xnkhaiquan/video/7616375934689594645). Phản ứng từ cộng đồng chủ yếu thể hiện sự lo lắng về lạm phát và tác động tiêu cực đến kinh tế [Nguồn](http://facebook.com/100012470922463_2482438568848483). Tình hình hiện tại cho thấy nguy cơ giá dầu tiếp tục tăng và có thể dẫn đến khủng hoảng kinh tế toàn cầu [Nguồn](http://facebook.com/100013096001881_2399250247188152)."
