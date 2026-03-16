@@ -7,7 +7,7 @@ services:
       - "8000:8000"
     volumes:
       - ./reports:/app/reports
-      - ./static:/app/static
+      # Remove static volume mount to avoid conflicts with Docker image
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
