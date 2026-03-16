@@ -184,12 +184,14 @@ def serve_logo(filename):
             else:
                 mimetype = 'application/octet-stream'
             
-            return send_file(
+            response = send_file(
                 logo_path,
                 mimetype=mimetype,
-                as_attachment=False,
-                cache_timeout=31536000  # 1 year cache
+                as_attachment=False
             )
+            # Set cache headers manually
+            response.cache_control.max_age = 31536000  # 1 year cache
+            return response
         else:
             print(f"Logo file not found: {logo_path}")
             return "Logo not found", 404
@@ -227,12 +229,14 @@ def serve_static(filename):
             }
             mimetype = mime_types.get(ext, 'application/octet-stream')
             
-            return send_file(
+            response = send_file(
                 static_path,
                 mimetype=mimetype,
-                as_attachment=False,
-                cache_timeout=31536000  # 1 year cache
+                as_attachment=False
             )
+            # Set cache headers manually
+            response.cache_control.max_age = 31536000  # 1 year cache
+            return response
         else:
             print(f"Static file not found: {static_path}")
             return "File not found", 404
